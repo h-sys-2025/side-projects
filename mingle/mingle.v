@@ -20,7 +20,9 @@ fn add_all_and_commit(message string, repo string) bool {
     return commit_result.exit_code == 0
 }
 
-
+/*
+ * MINGLE -- is a version control automater for my side-projects repo!
+ */
 fn main() {
     // cd to ../
     bin_path := os.executable()
