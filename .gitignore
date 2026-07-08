@@ -1,0 +1,198 @@
+# --- Binaries & Compiled Objects ---
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.dylib
+*.out
+*.app
+*.class
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+*.ilk
+*.exp
+*.lib
+*.a
+*.bc
+*.gcno
+*.gcda
+*.gcov
+*.swo
+*.swp
+*.orig
+*.rej
+*~
+\#*\#
+.DS_Store
+Thumbs.db
+
+# --- Node.js & JavaScript ---
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.eslintcache
+coverage/
+.nyc_output/
+dist/
+build/
+
+# --- Package Managers & Dependencies ---
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+env/
+venv/
+ENV/
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.pytest_cache/
+.mypy_cache/
+
+# Ruby
+*.gem
+*.rbc
+.bundle/
+vendor/bundle/
+Gemfile.lock
+.ruby-version
+.ruby-gemset
+
+# PHP
+/vendor/
+composer.lock
+.phpunit.result.cache
+
+# Go
+go.sum
+go.work
+go.work.sum
+
+# Rust
+/target/
+**/*.rs.bk
+Cargo.lock
+
+# Java/Gradle/Maven
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+*.jar
+*.war
+*.ear
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
+# --- IDEs & Editors ---
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# IntelliJ IDEA / JetBrains
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# Eclipse
+.classpath
+.project
+.settings/
+bin/
+
+# Vim
+*.swp
+*.swo
+*~
+.netrwhist
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# --- OS Generated Files ---
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.Trash-*
+.nfs*
+
+# --- Logs & Databases ---
+*.log
+logs/
+*.sqlite
+*.sqlite3
+*.db
+*.sql
+dump.rdb
+
+# --- Environment & Secrets ---
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+secrets.json
+config.local.json
+
+# --- GOTERMX things ---
+*.backup
