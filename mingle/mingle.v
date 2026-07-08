@@ -45,8 +45,12 @@ fn main() {
         full_path := os.join_path(dir_path, entry)
 
         // Filter only directories (excluding symlinks to directories if desired)
-        if os.is_dir(full_path) {
-            dirs << full_path
+        if os.is_dir(full_path){
+            // check if it is NOT .git dir!
+            u1 := full_path.split("/")
+            if u1[u1.len-1] != ".git"{
+                dirs << full_path
+            }
         }
     }
 
