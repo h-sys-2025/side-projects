@@ -1,6 +1,6 @@
 module main
 
-import os
+// only used for file loading and saving: import os
 
 fn split_2(text string) []string {
     mut z := ""
@@ -61,22 +61,35 @@ fn main() {
     // println(translation_table)
     // println(text)
 
+    /* WE DO NOT NEED TO SAVE THEM RN!
     output_path := os.dir(os.executable())
 
     translation_table_path := os.join_path(output_path,".","translation.table")
     encoded_file_path := os.join_path(output_path,".","encoded.text")
 
     os.write_file(translation_table_path, "${translation_table}") or {
-        println("writng to ${translation_table_path}: failed!")
+        println("[!] writing to ${translation_table_path}: failed!")
         return
     }
-    println("writng to ${translation_table_path}: ok!")
+    println("[+] writing to ${translation_table_path}: ok!")
 
     os.write_file(encoded_file_path, text) or {
-        println("Writing to ${encoded_file_path}: failed!")
+        println("[!] Writing to ${encoded_file_path}: failed!")
         return
     }
-    println("Writing to ${encoded_file_path}: ok!")
+    println("[+] Writing to ${encoded_file_path}: ok!")
+    */
+
+    // now we write the reverser
+    // load both files? no-need!
+    println(" --> this is encoded thing: ${text}\n")
+    println(" --> this is translation table: ${translation_table}\n")
+    println(" --> DECODING USING TRANSLATION TABLE....\n")
+    for x,y in translation_table {
+        text = text.replace(y, x)
+    }
+    println(" --> this is decoded thing: ${text}")
+
     // done
     return
 }
