@@ -6,7 +6,7 @@ import time
 // Returns true on success, false on failure.
 fn add_all_and_commit(message string, repo string) bool {
     // Step 1: git add .
-    add_args := ['git', '-C', repo, 'add', '.']
+    add_args := ["git", "-C", repo, "add", "."]
     add_result := os.exec(add_args)
 
     if add_result.exit_code != 0 {
@@ -14,7 +14,7 @@ fn add_all_and_commit(message string, repo string) bool {
     }
 
     // Step 2: git commit -m "message"
-    commit_args := ['git', '-C', repo, 'commit', '-m', message]
+    commit_args := ["git", "-C", repo, "commit", "-m", message]
     commit_result := os.exec(commit_args)
 
     return commit_result.exit_code == 0
@@ -28,20 +28,20 @@ fn main() {
     bin_path := os.executable()
     dir_path := os.join_path(os.dir(bin_path), "..")
     os.chdir(dir_path) or {
-        println('Error changing directory: ${err}')
+        println("Error changing directory: ${err}")
         return
     }
 
     // find all directories
-    entries := os.ls('.') or {
-        eprintln('Failed to read directory: ${err}')
+    entries := os.ls(".") or {
+        eprintln("Failed to read directory: ${err}")
         return
     }
 
 
     mut dirs := []string{}
     for entry in entries {
-        // Construct full path to check if it's a directory
+        // Construct full path to check if it"s a directory
         full_path := os.join_path(dir_path, entry)
 
         // Filter only directories (excluding symlinks to directories if desired)
@@ -58,7 +58,7 @@ fn main() {
     mut dirs_not_to_commit := []string{}
     for_dirs: for dir in dirs {
         files := os.ls(dir) or {
-            eprintln('Failed to read directory: ${err}')
+            eprintln("Failed to read directory: ${err}")
             return
         }
 
