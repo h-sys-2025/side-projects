@@ -100,7 +100,7 @@ fn main() {
         direc  := direc1[direc1.len-1]
         side_proj := os.join_path(dir_path, ".", direc)
         msg := "mingle: autocommit ${time.now()}"
-        println(" - commiting: ${side_proj}: message: ${msg}")
+        println(" _*_ commiting: ${side_proj}: message: ${msg} _*_")
         add_all_and_commit(msg, dir_path)
     }
     // now git push origin master
