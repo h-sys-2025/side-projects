@@ -1,23 +1,23 @@
 module main
 
+import os
+
 fn main() {
     if arguments().len < 2 {
-        eprintln("portenum: usage: ${arguments()[0]} <ip>:<port>")
+        eprintln("portenum: usage: ${arguments()[0]} <ip>")
         return
     }
 
-    u1 := arguments()[1].split(":")
-    if u1.len < 2 {
-        eprintln("portenum: usage: ${arguments()[0]} <ip>:<port>")
-        return
-    }
-    mut iip := u1[0]
-    pport := u1[1]
-    iip := parse_safe_ip(iip)
-
-    println("starting scan on ip ${iip}:${pport}")
-
+    scan_w_fmt(parse_safe_ip(arguments()[1]))
     return
+}
+
+fn scan_w_fmt(ip string) {
+    println("starting scan on ${ip}")
+    for x in 0..1000 {
+        res := os.execute("nc -v -n -w 1 ${ip} ${x}")
+        println("port: ${x} on ${ip}: ${res.output}")
+    }
 }
 
 fn parse_safe_ip(make_believe_ip string) string {

@@ -82,20 +82,6 @@ fn main() {
             continue for_dir
         }
 
-        /*
-        is_git := is_git_repo(dir)
-        println("comitting: ${dir} (is git repo? ${is_git})")
-        if !is_git {
-            println(" - initlized a git repo at: ${dir}")
-            init_git_repo(dir)
-        }
-
-        has_ignore_file := has_gitignore(dir)
-        if !has_ignore_file {
-            println(" - creating a .gitignore file at: ${dir}")
-            create_gitignore(dir)
-        }
-        */
         direc1 := dir.split("/")
         direc  := direc1[direc1.len-1]
         side_proj := os.join_path(dir_path, ".", direc)
