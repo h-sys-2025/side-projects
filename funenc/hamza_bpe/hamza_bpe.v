@@ -25,7 +25,7 @@ pub fn please_encode_this(message string) (string, map[string]string) {
     text = text.to_lower()
 
     // chinese failed: unused_placeholder_bytes := "人大大小小中上下天地心水火木山女子爱家学生月日明和国年时生友好新老高美文语信电电话车路书字口耳手足目食鱼鸟虫"
-    unused_placeholder_bytes := "ABCDEFGHIJKLMNOPQRSTUVQZYZ" // just use uppercase english
+    unused_placeholder_bytes := "ABCDEFGHIJKLMNOPQRSTUVWXYZ" // just use uppercase english
 
     mut unused_placeholder_i := 0
 

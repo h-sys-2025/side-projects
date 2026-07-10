@@ -23,10 +23,11 @@ fn main() {
     // byte pair encoding, oh yeah!
     // res: https://en.wikipedia.org/wiki/Byte-pair_encoding
     mut text := "The original BPE algorithm operates by iteratively replacing the most common contiguous sequences of characters in a target text with unused 'placeholder' bytes. The iteration ends when no sequences can be found, leaving the target text effectively compressed. Decompression can be performed by reversing this process, querying known placeholder terms against their corresponding denoted sequence, using a lookup table. In the original paper, this lookup table is encoded and stored alongside the compressed text."
+    mut whatever := text.to_lower()
     text = text.to_lower()
 
     // chinese failed: unused_placeholder_bytes := "人大大小小中上下天地心水火木山女子爱家学生月日明和国年时生友好新老高美文语信电电话车路书字口耳手足目食鱼鸟虫"
-    unused_placeholder_bytes := "ABCDEFGHIJKLMNOPQRSTUVQZYZ" // just use uppercase english
+    unused_placeholder_bytes := "ABCDEFGHIJKLMNOPQRSTUVWXYZ<>{}[]()" // just use uppercase english
 
     mut unused_placeholder_i := 0
 
@@ -58,6 +59,9 @@ fn main() {
             break
         }
     }
+    if unused_placeholder_i < unused_placeholder_bytes.len {
+        println("i have more placeholders!")
+    }
     // println(translation_table)
     // println(text)
 
@@ -85,11 +89,16 @@ fn main() {
     println(" --> this is encoded thing: ${text}\n")
     println(" --> this is translation table: ${translation_table}\n")
     println(" --> DECODING USING TRANSLATION TABLE....\n")
+    mut ttext := text
     for x,y in translation_table {
-        text = text.replace(y, x)
+        ttext = ttext.replace(y, x)
     }
-    println(" --> this is decoded thing: ${text}")
-
+    println(" --> this is decoded thing: ${ttext}\n\n")
+    if whatever.split(" ").len == ttext.split(" ").len && whatever == ttext {
+        println("initial and decoded texts match, success!")
+    } else {
+        println("initial and decoded texts DO NOT MATCH, failure!!!!!!!")
+    }
     // done
     return
 }

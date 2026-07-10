@@ -27,6 +27,6 @@ fn main() {
         text = text.replace(y, x)
     }
     println("\n\n${encrypted_bfe} -> ${bfe_inst.data} -> ${text}")
-
+    println("\n\ntranslation table for bpe: ${translation_table}\n\nbfe_inst: ${bfe_inst}")
     return
 }
