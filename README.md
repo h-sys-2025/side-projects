@@ -10,4 +10,6 @@
 ## `2. Only use V-language`
 > *(because `v` is goat!)*
 
-- P.S. It has a custom project manger *`mingle`*.
+### This repo has its own custom project manger *`mingle`*.
+- It also generates docmentations (using *`autodoc`*).
+- And commites all things for me.
