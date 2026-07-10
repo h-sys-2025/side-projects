@@ -89,32 +89,7 @@ fn main() {
         direc  := direc1[direc1.len-1]
         side_proj := os.join_path(dir_path, ".", direc)
         msg := "mingle: autocommit ${time.now()}"
-        // now file all .v files in them and make docs, using autodoc.
-        v_files := os.ls(side_proj) or {
-            eprintln("could not read .v files in dir ${side_proj}, skipping autodoc.")
-            return
-        }
-        next_v_file: for file in v_files {
-            if os.is_file(os.join_path(side_proj, ".",file)) {
-                ig1 := file.split("/")
-                name := ig1[ig1.len - 1]
-                if name.ends_with(".v") {
-                    file_path_x := os.join_path(side_proj,".",file)
-                    println(" -*- autodoc: ${file_path_x}")
-                    command := [autodoc_bin_path,file_path_x]
-                    cmd := os.exec(command)
-                    if cmd.exit_code != 0 {
-                        println(" !!! failed: ${cmd.output}")
-                    } else {
-                        println(" -+- generated docs!")
-                    }
-                }
-            } else if os.is_dir(os.join_path(side_proj, ".",file)) {
-                println("dir found")
-            } else {
-                continue next_v_file
-            }
-        }
+        find_and_autodoc_v_files(side_proj)
         //
         println(" _*_ commiting: ${side_proj}: message: ${msg} _*_")
         add_all_and_commit(msg, dir_path)
@@ -130,4 +105,40 @@ fn main() {
     }
     // exit gracefully
     return
+}
+
+fn find_and_autodoc_v_files(side_proj string) {
+    // now file all .v files in them and make docs, using autodoc.
+    bin_path := os.executable()
+    dir_path := os.join_path(os.dir(bin_path), "..")
+
+    autodoc_bin_path := os.join_path(dir_path, ".","autodoc","autodoc")
+
+
+    v_files := os.ls(side_proj) or {
+        eprintln("could not read .v files in dir ${side_proj}, skipping autodoc.")
+        return
+    }
+    next_v_file: for file in v_files {
+        something := os.join_path(side_proj, ".",file)
+        if os.is_file(something) {
+            ig1 := file.split("/")
+            name := ig1[ig1.len - 1]
+            if name.ends_with(".v") {
+                file_path_x := os.join_path(side_proj,".",file)
+                println(" -*- autodoc: ${file_path_x}")
+                command := [autodoc_bin_path,file_path_x]
+                cmd := os.exec(command)
+                if cmd.exit_code != 0 {
+                    println(" !!! failed: ${cmd.output}")
+                } else {
+                    println(" -+- generated docs!")
+                }
+            }
+        } else if os.is_dir(something) {
+            find_and_autodoc_v_files(something)
+        } else {
+            continue next_v_file
+        }
+    }
 }
