@@ -99,7 +99,7 @@ fn main() {
                 ig1 := file.split("/")
                 name := ig1[ig1.len - 1]
                 if name.ends_with(".v") {
-                    file_path_x := os.join_path(side_proj,file)
+                    file_path_x := os.join_path(side_proj,".",file)
                     println(" -*- autodoc: ${file_path_x}")
                     command := [autodoc_bin_path,file_path_x]
 
