@@ -101,9 +101,13 @@ fn main() {
                 if name.ends_with(".v") {
                     file_path_x := os.join_path(side_proj,file)
                     println(" -*- autodoc: ${file_path_x}")
-                    //command := [autodoc_bin_path,file_path_x]
-                    //cmd := os.exec(command)
-                    println(" -+- generated docs!")
+                    command := [autodoc_bin_path,file_path_x]
+                    cmd := os.exec(command)
+                    if cmd.exit_code != 0 {
+                        println(" !!! failed: ${cmd.output}")
+                    } else {
+                        println(" -+- generated docs!")
+                    }
                 }
             } else {
                 continue next_v_file
