@@ -109,6 +109,8 @@ fn main() {
                         println(" -+- generated docs!")
                     }
                 }
+            } else if os.is_dir(os.join_path(side_proj, ".",file)) {
+                println("dir found")
             } else {
                 continue next_v_file
             }
