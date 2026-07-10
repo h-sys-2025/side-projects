@@ -9,3 +9,5 @@
 
 ## `2. Only use V-language`
 > *(because `v` is goat!)*
+
+- P.S. It has a custom project manger *`mingle`*.
