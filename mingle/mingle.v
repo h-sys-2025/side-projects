@@ -28,8 +28,6 @@ fn main() {
     bin_path := os.executable()
     dir_path := os.join_path(os.dir(bin_path), "..")
 
-    autodoc_bin_path := os.join_path(dir_path, ".","autodoc","autodoc")
-
     os.chdir(dir_path) or {
         println("Error changing directory: ${err}")
         return
