@@ -44,7 +44,8 @@ fn main() {
     mut docs := gen_dev_docs(content)
     md_docs := doc_to_md(docs)
 
-    mut dest_file_path := "${os.base(source_file_path).replace(".v",".md")}"
+    mut dest_file_path := "${source_file_path.replace(".v",".md")}"
+
     mut fd := os.create(dest_file_path) or {
         println("failed to create .md file: ${err}")
         return
