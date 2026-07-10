@@ -26,7 +26,10 @@ fn main() {
         eprintln('${arguments()[0]}: usage: ${arguments()[0]} <file_path.v>')
         return
     }
-
+    if !source_file_path.ends_with(".v") {
+        eprintln("are you sure that ${source_file_path} is a .v file? Because it does not end with .v!!")
+        return
+    }
     // make sure that file is accessable, and is not root provlidged?
     // and make sure that file is NOT empty
     mut content := os.read_lines(source_file_path) or {
@@ -40,9 +43,24 @@ fn main() {
 
     mut docs := gen_dev_docs(content)
     md_docs := doc_to_md(docs)
-    println(md_docs)
-    // save data into .json file
-    // load .json file and convert to markdown!
+
+    mut dest_file_path := "${os.base(source_file_path).replace(".v",".md")}"
+    mut fd := os.create(dest_file_path) or {
+        println("failed to create .md file: ${err}")
+        return
+    }
+    old_data := os.read_file(dest_file_path) or {
+        eprintln("file ${dest_file_path} does not exist!")
+        return
+    }
+    if old_data != "" {
+        eprintln("the file ${dest_file_path} is not empty.")
+        fd.close()
+        return
+    }
+    fd.write_string(md_docs)!
+    println("saved documentation to ${dest_file_path}")
+    fd.close()
     // exit gracefully!
     return
 }
