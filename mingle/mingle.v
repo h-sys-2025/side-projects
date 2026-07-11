@@ -98,6 +98,7 @@ fn main() {
 
         git_status := os.exec(["git","status"])
         want_to_cmmit := git_status.output.contains("Changes not staged for commit")
+        println(git_status)
         os.chdir(dir_path) or {
             println("Error changing directory: ${err}")
             return
