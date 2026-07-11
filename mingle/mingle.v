@@ -102,14 +102,17 @@ fn main() {
             println("Error changing directory: ${err}")
             return
         }
+
         if want_to_cmmit {
             msg := "mingle: autocommit ${time.now()}"
             find_and_autodoc_v_files(side_proj)
             //
             println(" _*_ commiting: ${side_proj}: message: ${msg} _*_")
             add_all_and_commit(msg, dir_path)
+            continue for_dir
         } else {
             println(" ___ nothing to commit in ${side_proj} ___}")
+            continue for_dir
         }
     }
     // now git push origin master
