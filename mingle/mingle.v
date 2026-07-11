@@ -97,17 +97,20 @@ fn main() {
         }
 
         git_status := os.exec(["git","status"])
-        println(git_status.output.contains("nothing to commit"))
+        want_to_cmmit := git_status.output.contains("Changes not staged for commit")
         os.chdir(dir_path) or {
             println("Error changing directory: ${err}")
             return
         }
-
-        msg := "mingle: autocommit ${time.now()}"
-        find_and_autodoc_v_files(side_proj)
-        //
-        println(" _*_ commiting: ${side_proj}: message: ${msg} _*_")
-        add_all_and_commit(msg, dir_path)
+        if want_to_cmmit {
+            msg := "mingle: autocommit ${time.now()}"
+            find_and_autodoc_v_files(side_proj)
+            //
+            println(" _*_ commiting: ${side_proj}: message: ${msg} _*_")
+            add_all_and_commit(msg, dir_path)
+        } else {
+            println(" ___ nothing to commit in ${side_proj} ___}")
+        }
     }
     // now git push origin master
     command := ["git","push","origin","master"]
@@ -141,10 +144,10 @@ fn find_and_autodoc_v_files(side_proj string) {
             name := ig1[ig1.len - 1]
             if name.ends_with(".v") {
                 file_path_x := os.join_path(side_proj,".",file)
-                if os.is_file(file_path_x.replace(".v",".md")) {
+                /*if os.is_file(file_path_x.replace(".v",".md")) {
                     println(" -*-  [SKIP] autodoc: ${file_path_x}")
                     continue next_v_file
-                }
+                }*/
                 println(" -*- autodoc: ${file_path_x}")
                 command := [autodoc_bin_path,file_path_x]
                 cmd := os.exec(command)
