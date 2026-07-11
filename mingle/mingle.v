@@ -77,6 +77,7 @@ fn main() {
         }
     }
     // if not then: `git add $dir && git commit -m "mingle: autocommit"`
+
     for_dir: for dir in dirs {
         if dir in dirs_not_to_commit {
             println("ignored: ${dir}")
@@ -99,10 +100,6 @@ fn main() {
         git_status := os.exec(["git","status"])
         want_to_cmmit := git_status.output.contains("Changes not staged for commit")
         println(git_status)
-        os.chdir(dir_path) or {
-            println("Error changing directory: ${err}")
-            return
-        }
 
         if want_to_cmmit {
             msg := "mingle: autocommit ${time.now()}"
