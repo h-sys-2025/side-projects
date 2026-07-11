@@ -97,7 +97,7 @@ fn main() {
         }
 
         git_status := os.exec(["git","status"])
-        println(git_status)
+        println(git_status.output.contains("nothing to commit"))
         os.chdir(dir_path) or {
             println("Error changing directory: ${err}")
             return
