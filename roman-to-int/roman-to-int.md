@@ -2,10 +2,6 @@
 # Module:
 - main
 
-## Dependencies:
-```v
-```
-
 ## Functions:
 ```v
 fn main() {
