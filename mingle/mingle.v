@@ -124,6 +124,10 @@ fn find_and_autodoc_v_files(side_proj string) {
             name := ig1[ig1.len - 1]
             if name.ends_with(".v") {
                 file_path_x := os.join_path(side_proj,".",file)
+                if os.is_file(file_path_x.replace(".v",".md")) {
+                    println(" -*-  [SKIP] autodoc: ${file_path_x}")
+                    continue next_v_file
+                }
                 println(" -*- autodoc: ${file_path_x}")
                 command := [autodoc_bin_path,file_path_x]
                 cmd := os.exec(command)
