@@ -85,9 +85,24 @@ fn main() {
 
         direc1 := dir.split("/")
         direc  := direc1[direc1.len-1]
+
         side_proj := os.join_path(dir_path, ".", direc)
-        git_status := os.exec(["cd",side_proj,"&&","git","status"])
+            os.chdir(dir_path) or {
+            println("Error changing directory: ${err}")
+            return
+        }
+        os.chdir(side_proj) or {
+            println("Error changing directory: ${err}")
+            return
+        }
+
+        git_status := os.exec(["git","status"])
         println(git_status)
+        os.chdir(dir_path) or {
+            println("Error changing directory: ${err}")
+            return
+        }
+
         msg := "mingle: autocommit ${time.now()}"
         find_and_autodoc_v_files(side_proj)
         //
