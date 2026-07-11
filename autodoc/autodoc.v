@@ -110,11 +110,14 @@ fn doc_to_md(docs Documentation) string {
         doc_md = '${doc_md}${my_dependencies}'
         doc_md = '${doc_md}\n```\n'
     }
+
     doc_md = '${doc_md}\n## Functions:'
     doc_md = '${doc_md}\n${my_functions}'
 
-    doc_md = '${doc_md}\n## Structs:'
-    doc_md = '${doc_md}\n${my_structs}'
+    if my_structs != "" {
+        doc_md = '${doc_md}\n## Structs:'
+        doc_md = '${doc_md}\n${my_structs}'
+    }
 
     return doc_md
 }
