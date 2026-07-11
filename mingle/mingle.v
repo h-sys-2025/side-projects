@@ -86,6 +86,8 @@ fn main() {
         direc1 := dir.split("/")
         direc  := direc1[direc1.len-1]
         side_proj := os.join_path(dir_path, ".", direc)
+        git_status := os.exec(["cd",side_proj,"git","status"])
+        println(git_status)
         msg := "mingle: autocommit ${time.now()}"
         find_and_autodoc_v_files(side_proj)
         //
