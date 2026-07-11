@@ -104,11 +104,12 @@ fn doc_to_md(docs Documentation) string {
     doc_md = '${doc_md}\n# Module:'
     doc_md = '${doc_md}\n- ${module_name}\n'
 
-    doc_md = '${doc_md}\n## Dependencies:'
-    doc_md = '${doc_md}\n```v'
-    doc_md = '${doc_md}${my_dependencies}'
-    doc_md = '${doc_md}\n```\n'
-
+    if my_dependencies := "" {
+        doc_md = '${doc_md}\n## Dependencies:'
+        doc_md = '${doc_md}\n```v'
+        doc_md = '${doc_md}${my_dependencies}'
+        doc_md = '${doc_md}\n```\n'
+    }
     doc_md = '${doc_md}\n## Functions:'
     doc_md = '${doc_md}\n${my_functions}'
 
