@@ -1,6 +1,7 @@
 module main
 
 import os
+import time
 
 //@ Returns true on success, false on failure.
 fn add_all_and_commit(message string, file_changed string) bool {
@@ -177,7 +178,7 @@ fn autodoc_and_commit(dir_path string) []string {
                         println(" -+- generated docs!")
                     }
                 }
-                add_all_and_commit("mingle-v2",file_path_x)
+                add_all_and_commit("mingle-v2: ${time.now()}",file_path_x)
             }
         }
     }
