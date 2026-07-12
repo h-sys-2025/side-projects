@@ -9,9 +9,13 @@ import os
 
 ## Functions:
 ```v
-fn add_all_and_commit(message string, repo string) bool {
+// Returns true on success, false on failure.
+fn add_all_and_commit(message string, file_changed string) bool {
 ```
 ```v
+//
+// MINGLE -- is a version control automater for my side-projects repo!
+//
 fn main() {
 ```
 ```v
