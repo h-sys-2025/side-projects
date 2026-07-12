@@ -5,7 +5,6 @@
 ## Dependencies:
 ```v
 import os
-import time
 ```
 
 ## Functions:
@@ -17,6 +16,11 @@ fn main() {
 ```
 ```v
 fn find_and_autodoc_v_files(side_proj string) {
+```
+```v
+// this function uses advanced strng manipulation to
+// get the dirs which we need to commit!
+fn autodoc_and_commit(dir_path string) []string {
 ```
 
 ## Structs:
