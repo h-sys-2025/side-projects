@@ -1,28 +1,39 @@
 module main
 
 import os
-import time
 
-// Returns true on success, false on failure.
-fn add_all_and_commit(message string, repo string) bool {
+//@ Returns true on success, false on failure.
+fn add_all_and_commit(message string, file_changed string) bool {
+    bin_path := os.executable()
+    dir_path := os.join_path(os.dir(bin_path), "..")
+
+    os.chdir(dir_path) or {
+        println("Error changing directory: ${err}")
+        return false
+    }
+
     // Step 1: git add .
-    add_args := ["git", "-C", repo, "add", "."]
+    println(" _#_ commiting ${file_changed}  _#_")
+
+    add_args := ["git", "add", file_changed]
     add_result := os.exec(add_args)
 
     if add_result.exit_code != 0 {
+        println(" _!_ commit failed _!_ \n\t-->${add_result.output}")
         return false
     }
 
     // Step 2: git commit -m "message"
-    commit_args := ["git", "-C", repo, "commit", "-m", message]
+    commit_args := ["git", "commit", "-m", message]
     commit_result := os.exec(commit_args)
+    println(" _#_ commit successfull _#_")
 
     return commit_result.exit_code == 0
 }
 
-/*
- * MINGLE -- is a version control automater for my side-projects repo!
- */
+//@
+//@ MINGLE -- is a version control automater for my side-projects repo!
+//@
 fn main() {
     // cd to ../
     bin_path := os.executable()
@@ -76,43 +87,10 @@ fn main() {
             }
         }
     }
+
     // if not then: `git add $dir && git commit -m "mingle: autocommit"`
+    _ := autodoc_and_commit(dir_path)
 
-    for_dir: for dir in dirs {
-        if dir in dirs_not_to_commit {
-            println("ignored: ${dir}")
-            continue for_dir
-        }
-
-        direc1 := dir.split("/")
-        direc  := direc1[direc1.len-1]
-
-        side_proj := os.join_path(dir_path, ".", direc)
-            os.chdir(dir_path) or {
-            println("Error changing directory: ${err}")
-            return
-        }
-        os.chdir(side_proj) or {
-            println("Error changing directory: ${err}")
-            return
-        }
-
-        git_status := os.exec(["git","status"])
-        want_to_cmmit := git_status.output.contains("Changes not staged for commit")
-        println(git_status)
-
-        if want_to_cmmit {
-            msg := "mingle: autocommit ${time.now()}"
-            find_and_autodoc_v_files(side_proj)
-            //
-            println(" _*_ commiting: ${side_proj}: message: ${msg} _*_")
-            add_all_and_commit(msg, dir_path)
-            continue for_dir
-        } else {
-            println(" ___ nothing to commit in ${side_proj} ___}")
-            continue for_dir
-        }
-    }
     // now git push origin master
     command := ["git","push","origin","master"]
     cmd := os.exec(command)
@@ -164,4 +142,44 @@ fn find_and_autodoc_v_files(side_proj string) {
             continue next_v_file
         }
     }
+}
+
+//@ this function uses advanced strng manipulation to
+//@ get the dirs which we need to commit!
+fn autodoc_and_commit(dir_path string) []string {
+    autodoc_bin_path := os.join_path(dir_path, ".","autodoc","autodoc")
+
+    mut dirs := []string{}
+
+    git_status := os.exec(["git","status"])
+    // test: println(git_status)
+    //--
+    u1 := git_status.output.split("\n")
+    for u2 in u1 {
+        line := u2.trim_space()
+        lline := line.split(" ")
+
+        for u3 in 0..lline.len {
+            u4 := lline[u3]
+            if u4 == "modified:" {
+                u5 := lline[u3+3]
+                dirs << u5
+                file_path_x := os.join_path(dir_path,".",u5)
+                println(" _+_ modified: ${file_path_x} _+_")
+                if file_path_x.ends_with(".v") {
+                    println(" _!_ seemds to be a .v file! _!_")
+                    println(" _+_ autodoc: ${file_path_x} _+_")
+                    command := [autodoc_bin_path,file_path_x]
+                    cmd := os.exec(command)
+                    if cmd.exit_code != 0 {
+                        println(" !!! failed: ${cmd.output}")
+                    } else {
+                        println(" -+- generated docs!")
+                    }
+                }
+                add_all_and_commit("mingle-v2",file_path_x)
+            }
+        }
+    }
+    return dirs
 }
