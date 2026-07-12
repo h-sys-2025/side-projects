@@ -5,6 +5,7 @@
 ## Dependencies:
 ```v
 import os
+import time
 ```
 
 ## Functions:
