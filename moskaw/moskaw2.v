@@ -20,7 +20,7 @@ fn main() {
     }
 
     model := build_model(tokenized, 2)
-    println(model)
+    // test: println("raw_model: ${model}")
     println("Model size: ${model.len} contexts")
 
     if model.len == 0 {
