@@ -67,6 +67,9 @@ fn main() {
         }
     }
 
+    u1 := ["git","add","."]
+    _ := os.exec(u1)
+
     // check if they contain mingle.ignore
     mut dirs_not_to_commit := []string{}
     for_dirs: for dir in dirs {
