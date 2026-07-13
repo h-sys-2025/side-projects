@@ -69,7 +69,10 @@ fn main() {
 fn doc_to_md(docs Documentation) string {
     mut my_functions := ''
     mut my_structs := ''
+
     mut my_dependencies := ''
+    mut my_constants := ''
+
     mut module_name := ''
 
     for stmt in docs.stmts {
@@ -97,6 +100,12 @@ fn doc_to_md(docs Documentation) string {
                 dev_docs = '\n${stmt.dev_docs.join('\n').replace('//@', '//')}'
             }
             my_dependencies = '${my_dependencies}${dev_docs}\n${stmt.code_ref}'
+        } else if name == 'const' {
+            mut dev_docs := ''
+            if stmt.dev_docs.len > 0 {
+                dev_docs = '\n${stmt.dev_docs.join('\n').replace('//@', '//')}'
+            }
+            my_constants = '${my_constants}${dev_docs}\n${stmt.code_ref}'
         }
     }
 
@@ -110,6 +119,14 @@ fn doc_to_md(docs Documentation) string {
         doc_md = '${doc_md}${my_dependencies}'
         doc_md = '${doc_md}\n```\n'
     }
+
+    if my_constants != "" {
+        doc_md = '${doc_md}\n## Constants:'
+        doc_md = '${doc_md}\n```v'
+        doc_md = '${doc_md}${my_constants}'
+        doc_md = '${doc_md}\n```\n'
+    }
+
 
     doc_md = '${doc_md}\n## Functions:'
     doc_md = '${doc_md}\n${my_functions}'
@@ -166,6 +183,15 @@ fn gen_dev_docs(content []string) Documentation {
             if line.starts_with('import ') {
                 docs.stmts << DocObj{
                     kind:     'import'
+                    dev_docs: dev_docs
+                    code_ref: line
+                }
+                dev_docs = []string{}
+                continue next_line
+            }
+            if line.starts_with('const ') {
+                docs.stmts << DocObj{
+                    kind:     'const'
                     dev_docs: dev_docs
                     code_ref: line
                 }
