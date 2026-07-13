@@ -27,5 +27,3 @@ fn find_and_autodoc_v_files(side_proj string) {
 // get the dirs which we need to commit!
 fn autodoc_and_commit(dir_path string) []string {
 ```
-
-## Structs:

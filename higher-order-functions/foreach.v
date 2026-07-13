@@ -53,6 +53,7 @@ pub fn (mut llist List[T]) foreach(func fn(T) ?T) {
     }
 }
 
+// main function (testing mingle again, ignore this!!)
 fn main() {
     // generics!!!!!! awsome
     mut names := List[string]{}
