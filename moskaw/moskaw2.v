@@ -3,24 +3,17 @@ module main
 import os
 import math
 import rand
-import strings
 
 fn main() {
-    corpus_file_path := "./small_data.txt"
+    corpus_file_path := "./raw_data.txt"
 
     fmt_corpus(corpus_file_path)
     data := get_data(corpus_file_path)
 
-    println("Raw data length: ${data.len} characters")
-
     tokenized := tokenize(data)
-    println("Tokens count: ${tokenized.len}")
-    if tokenized.len > 0 {
-        println("First 15 tokens: ${tokenized[0..min(15, tokenized.len)]}")
-    }
 
+    // order=2 allows predicting up to 2 tokens at once (e.g., "was|a")
     model := build_model(tokenized, 2)
-    // test: println("raw_model: ${model}")
     println("Model size: ${model.len} contexts")
 
     if model.len == 0 {
@@ -30,22 +23,34 @@ fn main() {
 
     println("\nGenerating prediction from 'helicopter'...")
     result := predict_n(model, "helicopter", 20, 0.75)
+
+    // Result is now cleanly space-separated without stray '|' characters
     println(result.join(" "))
 
     return
 }
 
-//@ predict_n: Main prediction function with backoff
+//@ predict_n: Main prediction function with backoff and multi-token support
 fn predict_n(model map[string]map[string]f64, prompt string, n int, temperature f64) []string {
     if n <= 0 { return []string{} }
 
     mut predictions := []string{}
-    mut current_context := prompt
+    // Normalize prompt to use '|' as separator for multi-word prompts
+    mut current_context := prompt.replace(" ", "|")
 
     for _ in 0..n {
         next := get_next_with_backoff(model, current_context, temperature)
         if next == "" { break }
-        predictions << next
+
+        // Split the predicted sequence into individual tokens
+        // (e.g., "was|a" becomes "was" and "a" for clean final output)
+        for token in next.split('|') {
+            predictions << token
+        }
+
+        // The new context is the predicted sequence itself.
+        // Since `to_len` <= `order`, `next` has at most `order` tokens.
+        // The backoff mechanism naturally handles it (e.g., "was|a" -> "a" if "was|a" isn't found).
         current_context = next
     }
     return predictions
@@ -119,48 +124,55 @@ fn sample_with_temperature(dist map[string]f64, temperature f64) string {
     return candidates.last()
 }
 
-//@ build_model: Fixed sliding window
+//@ build_model: Variable length context and prediction up to `order`
 fn build_model(tokens []string, order int) map[string]map[string]f64 {
     mut model := map[string]map[string]f64{}
 
-    if tokens.len < 4 {
+    if tokens.len < 2 {
         println("Warning: Too few tokens (${tokens.len})")
         return model
     }
 
-    for level := 1; level <= order; level++ {
-        for i := 0; i <= tokens.len - 2*level; i++ {
+    for i := 0; i < tokens.len; i++ {
+        // Try all possible context lengths (from_len) from 1 to `order`
+        for from_len := 1; from_len <= order; from_len++ {
+            if i + from_len > tokens.len {
+                break
+            }
             mut from_parts := []string{}
-            for j := 0; j < level; j++ {
+            for j := 0; j < from_len; j++ {
                 from_parts << tokens[i + j]
             }
             from := from_parts.join('|')
 
-            mut to_parts := []string{}
-            for j := 0; j < level; j++ {
-                if i + level + j >= tokens.len { break }
-                to_parts << tokens[i + level + j]
-            }
-            if to_parts.len != level { continue }
+            // Try all possible prediction lengths (to_len) from 1 to `order`
+            for to_len := 1; to_len <= order; to_len++ {
+                if i + from_len + to_len > tokens.len {
+                    break
+                }
+                mut to_parts := []string{}
+                for j := 0; j < to_len; j++ {
+                    to_parts << tokens[i + from_len + j]
+                }
+                to := to_parts.join('|')
 
-            to := to_parts.join('|')
-
-            if from !in model {
-                model[from] = map[string]f64{}
+                if from !in model {
+                    model[from] = map[string]f64{}
+                }
+                model[from][to] += 1.0
             }
-            model[from][to] += 1.0
         }
     }
 
-    // Normalize
-    for _, mut transitions in model {
+    // Normalize probabilities safely in V
+    for from, _ in model {
         mut total := 0.0
-        for _, count in transitions {
+        for _, count in model[from] {
             total += count
         }
         if total > 0 {
-            for to, count in transitions {
-                transitions[to] = count / total
+            for to, count in model[from] {
+                model[from][to] = count / total
             }
         }
     }
