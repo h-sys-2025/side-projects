@@ -14,7 +14,7 @@ fn main() {
         return
     }
 
-    println(solve_day2_part2(data))
+    println(solve_day2_part2(data)) //
 }
 
 // Checks if a string is composed of a repeated substring (Part 2 logic)

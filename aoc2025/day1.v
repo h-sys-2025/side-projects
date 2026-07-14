@@ -27,7 +27,7 @@ fn main() {
     println(
         solve_day1_part2(turns, init_pos, limit)
     )
-    return
+    return //
 }
 
 //@ solves day-1 part-2
