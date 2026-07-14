@@ -36,13 +36,6 @@ fn main() {
     // - It means, removing all tabs, and extra spaces first!
     mut formatted := data
 
-    for {
-        if !formatted.contains("  ") {
-            break
-        }
-
-        formatted = formatted.split(" ").join(" ")
-    }
 
     println(formatted)
     return
