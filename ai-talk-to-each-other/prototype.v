@@ -17,7 +17,6 @@ fn main() {
     url := 'http://localhost:11434/v1/chat/completions'
     model := 'dagbs/qwen2.5-coder-1.5b-instruct-abliterated:iq4_xs'
 
-    // 1. Configure sampling parameters
     opts := OllamaOptions{
         num_ctx:        8192
         temperature:    0.7
@@ -28,8 +27,6 @@ fn main() {
         num_predict:    512
     }
 
-    // 2. Build the JSON payload manually to ensure 'options' is included correctly
-    // Note: The OpenAI-compatible endpoint expects 'options' at the root level alongside 'model' and 'messages'
     payload := `{
         "model": "${model}",
         "messages": [
@@ -49,13 +46,11 @@ fn main() {
         "stream": false
     }`
 
-    // 3. Set headers
     headers := http.new_header_from_map({
         http.CommonHeader.content_type: 'application/json'
         http.CommonHeader.accept:       'application/json'
     })
 
-    // 4. Send request
     conf := http.FetchConfig{
         method:     .post
         url:        url
@@ -69,7 +64,6 @@ fn main() {
         return
     }
 
-    // 5. Parse and print response
     if resp.status_code == 200 {
         mut json_resp := json.parse(resp.body) or {
             eprintln('JSON parse error: ${err}')
