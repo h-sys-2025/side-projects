@@ -18,19 +18,26 @@ fn split_2(text string) []string {
     return w
 }
 
+//@ const of replacing space.
+pub const space_replacer := "%%"
+//@ const of replacing new-line.
+pub const newline_replacer := "%$"
+
+//@ this function decodes it!
 pub fn please_decode_this(message string, translation_table map[string]string) string {
     mut text := message
     for x,y in translation_table {
         text = text.replace(y, x)
     }
-    return text
+    return text.split(space_replacer).join(" ").split(newline_replacer).join("\n")
 }
 
+//@ this functio encodes bpe
 pub fn please_encode_this(message string) (string, map[string]string) {
     // byte pair encoding, oh yeah!
     // res: https://en.wikipedia.org/wiki/Byte-pair_encoding
     mut text := message
-    text = text.to_lower()
+    text = text.to_lower().split("\n").join(newline_replacer).split(" ").join(space_replacer)
 
     // chinese(or japanese, whatever) failed: unused_placeholder_bytes := "人大大小小中上下天地心水火木山女子爱家学生月日明和国年时生友好新老高美文语信电电话车路书字口耳手足目食鱼鸟虫"
     unused_placeholder_bytes := "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890" // just use uppercase english
