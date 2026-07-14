@@ -22,9 +22,9 @@ fn main() {
         "./../.ignore_this/raw_data.txt"
     }
     formatted_file := arguments()[2] or {
-        "./../.ignore_this/formatted_data.txt"
+        "./../.ignore_this/small_data.txt"
     }
-    mut data := os.read_file(data_file) or {
+    mut data := os.read_file(formatted_file) or {
         eprintln("could not read file ${data_file}: ${err}")
         return
     }
@@ -44,7 +44,7 @@ fn main() {
     bpe_ed, tt := bpe.please_encode_this(ddata)
     println("table: ${tt}")
     println(tokenizer(bpe_ed, tt))
-    println(bpe.please_decode_this(bpe_ed, tt))
+    // println(bpe.please_decode_this(bpe_ed, tt))
     return
 }
 
@@ -53,9 +53,9 @@ fn main() {
 fn tokenizer(message string, translation_table map[string]string) string {
     mut text := message
     for x,y in translation_table {
-        text = text.replace(y, x)
+        text = text.replace(y,"|${x}|")
     }
-    return text.split(bpe.space_replacer).join(" ").split(bpe.newline_replacer).join("\n")
+    return text.split(bpe.space_replacer).join(" ").split(bpe.newline_replacer).join("\n").split("||").join("|")
 }
 
 //@ const of punctuation
