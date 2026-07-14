@@ -1,6 +1,6 @@
 
 # Module:
-- 
+- main
 
 ## Functions:
 ```v
@@ -37,6 +37,11 @@ fn (mut llist List[T]) convert_map[U](func fn(T) U) List[U] {
 //PUBLIC
 
 fn (mut llist List[T]) foreach(func fn(T) ?T) {
+```
+```v
+//PRIVATE
+
+fn main() {
 ```
 
 ## Structs:
