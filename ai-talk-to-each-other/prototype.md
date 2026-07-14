@@ -21,12 +21,17 @@ const (
 ```v
 //PRIVATE
 
-fn call_ollama(messages []Message, speaker_name string, system_prompt string) string {
+fn build_messages(history []Turn, self_name string, system_prompt string) []Message {
 ```
 ```v
 //PRIVATE
 
-fn save_conversation(conversation []Message, filename string) {
+fn call_ollama(messages []Message) string {
+```
+```v
+//PRIVATE
+
+fn save_conversation(conversation []Turn, filename string) {
 ```
 ```v
 //PRIVATE
@@ -44,6 +49,11 @@ struct OllamaOptions {
 //PRIVATE
 
 struct Message {
+```
+```v
+//PRIVATE
+
+struct Turn {
 ```
 ```v
 //PRIVATE
