@@ -22,7 +22,7 @@ fn main() {
         "./../.ignore_this/raw_data.txt"
     }
     formatted_file := arguments()[2] or {
-        "./../.ignore_this/small_data.txt"
+        "./../.ignore_this/formatted_data.txt"
     }
     mut data := os.read_file(formatted_file) or {
         eprintln("could not read file ${data_file}: ${err}")
