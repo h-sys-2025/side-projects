@@ -197,3 +197,4 @@ config.local.json
 # --- GOTERMX things ---
 *.backup
 .ignore_this/
+*.json
