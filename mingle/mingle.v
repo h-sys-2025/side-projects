@@ -203,6 +203,7 @@ fn autodoc_and_commit(dir_path string, commit_all bool) []string {
             if file_path_x.ends_with(".backup") {
                 continue next_file
             }
+
             println(" _+_ modified: ${file_path_x} _+_")
             if file_path_x.ends_with(".v") {
                 println(" _!_ seems to be a .v file! _!_")
