@@ -41,7 +41,10 @@ fn main() {
     dir_path := os.join_path(os.dir(bin_path), "..")
 
     mut commit_all := false
-    if arguments()[1] == "yas" {
+    uu1 := arguments()[1] or {
+        ""
+    }
+    if uu1 == "yas" {
         commit_all = true
     }
 
