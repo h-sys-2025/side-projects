@@ -55,7 +55,7 @@ fn tokenizer(message string, translation_table map[string]string) string {
     for x,y in translation_table {
         text = text.replace(y,"|${x}|")
     }
-    return text.split(bpe.space_replacer).join(" ").split(bpe.newline_replacer).join("\n").split("||").join("|")
+    return text.split(bpe.space_replacer).join(" ").split(bpe.newline_replacer).join("\n").split("||").join("| |").split("||").join("|")
 }
 
 //@ const of punctuation
