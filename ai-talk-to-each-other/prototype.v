@@ -1,169 +1,88 @@
-module main
-
 import net.http
-import os
-import time
+import json
+
+// Define a struct for the options to keep code clean
+struct OllamaOptions {
+    num_ctx         int     = 4096  // Context window size
+    temperature     f64     = 0.8   // Creativity (0.0 - 2.0)
+    top_p           f64     = 0.9   // Nucleus sampling
+    top_k           int     = 40    // Top-K sampling
+    min_p           f64     = 0.05  // Minimum probability threshold
+    repeat_penalty  f64     = 1.1   // Repetition penalty
+    num_predict     int     = -1    // Max tokens to generate (-1 for infinite)
+    seed            int     = 0     // Random seed (0 for random)
+}
 
 fn main() {
-    /*
+    url := 'http://localhost:11434/v1/chat/completions'
+    model := 'dagbs/qwen2.5-coder-1.5b-instruct-abliterated:iq4_xs'
 
-    idea:
-
-    1. spin up 2 AIs: "dagbs/qwen2.5-coder-1.5b-instruct-abliterated:iq4_xs" *2
-    2. handle seperate context-windows without destrying my laptop!
-    3. CHAT!
-
-    */
-
-    mut skills := Skills{}
-
-    skills.new_skill(
-        "bash",
-        "Run a shell command and return stdout.",
-        ["command:string", "timeout:seconds"],
-        exec_bash,
-    )
-
-    mut bio := "You are a concise, tool-driven assistant.\n" +
-            "also follow these rules:\n" +
-            "1. never use emojis in any form.\n" +
-            "2. Do not use ascii secial chars.\n" +
-            "3. Dont overthink.\n" +
-            "4. Dont overdo any task.\n" +
-            "5. Think of user as a 10 year old kid, who is stubbrn and kinda stupid, so try to explain hard things like a 10 years old kid.\n" +
-            "6. Use basic engligh language words, do not use complex english words.\n" +
-           "Use the tool ONLY WHEN YOU REALLY NEED IT, like when you want to list files or dirs, or you want to run a bash command or whatever -- Always use a tool when one is available rather than guessing."
-
-    agent_personality := get_agent_personality()
-    bio = "${bio}\n${agent_personality}"
-
-    sys_prompt := gen_sys_prompt(skills, bio)
-
-    mut req := OllamaRequest{
-        model:      "dagbs/qwen2.5-coder-1.5b-instruct-abliterated:iq4_xs"
-        sys_prompt: sys_prompt
-        stream:     true
+    // 1. Configure sampling parameters
+    opts := OllamaOptions{
+        num_ctx:        8192
+        temperature:    0.7
+        top_p:          0.9
+        top_k:          40
+        min_p:          0.05
+        repeat_penalty: 1.1
+        num_predict:    512
     }
 
-    // Optional — validate the model exists before sending:
-    // ok, errmsg := req.set_model(req.model)
-    // if !ok { eprintln("Model error: ${errmsg}") return }
+    // 2. Build the JSON payload manually to ensure 'options' is included correctly
+    // Note: The OpenAI-compatible endpoint expects 'options' at the root level alongside 'model' and 'messages'
+    payload := `{
+        "model": "${model}",
+        "messages": [
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": "Explain quantum entanglement simply."}
+        ],
+        "options": {
+            "num_ctx": ${opts.num_ctx},
+            "temperature": ${opts.temperature},
+            "top_p": ${opts.top_p},
+            "top_k": ${opts.top_k},
+            "min_p": ${opts.min_p},
+            "repeat_penalty": ${opts.repeat_penalty},
+            "num_predict": ${opts.num_predict},
+            "seed": ${opts.seed}
+        },
+        "stream": false
+    }`
 
-    mut agentic_shit := 2
-    agentic_loop: for {
-      if agentic_shit == 2 {
-        agentic_shit = 0
-        continue agentic_loop
-      } else if agentic_shit == 1 {
-        resp_a := req.chat("continue.")
+    // 3. Set headers
+    headers := http.new_header_from_map({
+        http.CommonHeader.content_type: 'application/json'
+        http.CommonHeader.accept:       'application/json'
+    })
 
-        parsed_a := skills.parse(resp_a.response)
-
-        if parsed_a.plain_text() != "" {
-          println("\n[assistant text]\n${parsed_a.plain_text()}")
-        }
-
-        mut executed_results := ""
-
-        if parsed_a.tool_calls.len > 0 {
-          println("\n[tool calls detected]\n${parsed_a.fmt_parsed()}")
-          y_n := os.input(" [+++] DO YOU WANT TO EXECUTE THEM?: Y/N")
-          if y_n.to_lower() == "y" {
-            executed_results = "${executed_results}\n${skills.execute_all(parsed_a)}"
-            println("\n[tool results]\n${executed_results}")
-            req.messages << Message{
-              role: "user",
-              content: executed_results
-            }
-            agentic_shit = 1
-          } else {
-            println("\n[tool call denied]\n[tool results]\n${executed_results}")
-            req.messages << Message{
-              role: "user",
-              content: "USER DENIED TOOL CALL: ${executed_results} -- THINK ABOUT WHY USER DENIED, OR ASK HIM A QUESTION."
-            }
-            agentic_shit = 1
-          }
-
-        } else {
-          println("\n(no tool calls detected)")
-        }
-
-        agentic_shit = 0
-        continue agentic_loop
-      } else {
-        user_input := os.input(">>> ")
-        if user_input == "exit" {
-          goto end_agendtic_loop
-        }
-
-        resp_a := req.chat(user_input)
-        //println("\n[raw response]\n${resp_a.response}")
-
-        parsed_a := skills.parse(resp_a.response)
-
-        if parsed_a.plain_text() != "" {
-          println("\n[assistant text]\n${parsed_a.plain_text()}")
-        }
-
-        mut executed_results := ""
-
-        if parsed_a.tool_calls.len > 0 {
-          println("\n[tool calls detected]\n${parsed_a.fmt_parsed()}")
-          y_n := os.input(" [+++] DO YOU WANT TO EXECUTE THEM?: Y/N")
-          if y_n.to_lower() == "y" {
-            executed_results = "${executed_results}\n${skills.execute_all(parsed_a)}"
-            println("\n[tool results]\n${executed_results}")
-            req.messages << Message{
-              role: "user",
-              content: executed_results
-            }
-            agentic_shit = 1
-          } else {
-            println("\n[tool call denied]\n[tool results]\n${executed_results}")
-            req.messages << Message{
-              role: "user",
-              content: "USER DENIED TOOL CALL: ${executed_results} -- THINK ABOUT WHY USER DENIED, OR ASK HIM A QUESTION."
-            }
-            agentic_shit = 1
-          }
-
-        } else {
-          println("\n(no tool calls detected)")
-        }
-        continue agentic_loop
-      }
+    // 4. Send request
+    conf := http.FetchConfig{
+        method:     .post
+        url:        url
+        header:     headers
+        data:       payload
+        user_agent: 'v-ollama-advanced'
     }
 
-    end_agendtic_loop:
-    // println(req.messages)
-    mut chat_session := ""
-    for x in req.messages {
-      chat_session = "${chat_session}\n${x.role}:${x.content}"
+    resp := http.fetch(conf) or {
+        eprintln('Request failed: ${err}')
+        return
     }
-    os.execute("echo \'${chat_session}\' > /tmp/chat.session")
-    return
-}
 
-fn exec_bash(args map[string]string) string {
-    t_start := time.now().unix()
-    cmd     := args["command"] or { return "Error: missing command" }
-    timeout := args["timeout"] or { "10" }
+    // 5. Parse and print response
+    if resp.status_code == 200 {
+        mut json_resp := json.parse(resp.body) or {
+            eprintln('JSON parse error: ${err}')
+            return
+        }
 
-    // Construct the shell command with timeout
-    shell_cmd := 'timeout ${timeout} /bin/sh -c "${cmd}"'
-
-    // Execute the shell command and capture the result
-    result := os.execute(shell_cmd)
-
-    t_end := time.now().unix()
-    time_taken := t_end - t_start
-    return "EXIT CODE: ${result.exit_code} \n OUTPUT: ${result.output}\n [info] time-taken: ${time_taken}-seconds (max-timeout=${timeout}-seconds)"
-}
-
-fn get_agent_personality() string {
-    mut agent := os.read_file("../agents.md/Basic.agent.md") or {
-        return "AGENT_FILE_NOW_FOUND, TELL USER THAT AGENT FILE FAILED TO LOAD, YOU CANNOT WORK WITHOUT AGENTFILE. ASK USER TO EXIT."
+        choices := json_resp['choices'] or { [] }
+        if choices.len > 0 {
+            message := choices[0]['message'] or { {} }
+            content := message['content'] or { 'No content' }
+            println('Response:\n${content}')
+        }
+    } else {
+        eprintln('Error ${resp.status_code}: ${resp.body}')
     }
-    return agent
 }
