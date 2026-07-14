@@ -46,6 +46,3 @@ fn get_data(file_path string) string {
 ```v
 fn fmt_corpus(file_path string) {
 ```
-```v
-fn min(a int, b int) int {
-```

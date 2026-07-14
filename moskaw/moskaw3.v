@@ -4,7 +4,7 @@ import os
 import rand
 
 fn main() {
-    corpus_file_path := "./raw_data.txt"
+    corpus_file_path := "./../.ignore_this/raw_data.txt"
 
     // Ensure file exists for testing if you don't have one
     if !os.exists(corpus_file_path) {

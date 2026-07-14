@@ -5,7 +5,7 @@ import math
 import rand
 
 fn main() {
-    corpus_file_path := "./raw_data.txt"
+    corpus_file_path := "./../.ignore_this/raw_data.txt"
 
     fmt_corpus(corpus_file_path)
     data := get_data(corpus_file_path)

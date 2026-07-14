@@ -15,7 +15,7 @@ fn main() {
 
     */
 
-    corpos_file_path := "./raw_data.txt"
+    corpos_file_path := "./../.ignore_this/raw_data.txt"
     // testing reformat: fmt_corpus(corpos_file_path)
 
     data := get_data(corpos_file_path)
