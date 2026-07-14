@@ -255,8 +255,3 @@ fn fmt_corpus(file_path string) {
 
     os.write_file(file_path, lines.join("\n").to_lower()) or {}
 }
-
-// Helper
-fn min(a int, b int) int {
-    return if a < b { a } else { b }
-}

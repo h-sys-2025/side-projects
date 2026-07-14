@@ -7,7 +7,6 @@
 import os
 import math
 import rand
-import strings
 ```
 
 ## Constants:
@@ -21,7 +20,7 @@ const prohibited_chars := "[]—"
 fn main() {
 ```
 ```v
-// predict_n: Main prediction function with backoff
+// predict_n: Main prediction function with backoff and multi-token support
 fn predict_n(model map[string]map[string]f64, prompt string, n int, temperature f64) []string {
 ```
 ```v
@@ -33,7 +32,7 @@ fn get_next_with_backoff(model map[string]map[string]f64, context string, temper
 fn sample_with_temperature(dist map[string]f64, temperature f64) string {
 ```
 ```v
-// build_model: Fixed sliding window
+// build_model: Variable length context and prediction up to `order`
 fn build_model(tokens []string, order int) map[string]map[string]f64 {
 ```
 ```v
