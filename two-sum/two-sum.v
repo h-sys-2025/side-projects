@@ -7,11 +7,11 @@ fn main() {
     }
     target := 69
 
-    answer := can_two_sum(list_of_numbers, target)
-    println("can two-sum be applied on out list? ${answer}!")
-    if answer == true {
-        println("two-sum result of our list is: ${two_sum(list_of_numbers,target)}")
-    }
+    // answer := can_two_sum(list_of_numbers, target)
+    // println("can two-sum be applied on out list? ${answer}!")
+    // if answer == true {
+    println("two-sum result of our list is: ${two_sum(list_of_numbers,target)}")
+    // }
 }
 
 fn can_two_sum(list_of_numbers []int, target int) bool {
@@ -26,7 +26,7 @@ fn can_two_sum(list_of_numbers []int, target int) bool {
 fn two_sum(list_of_numbers []int, target int) []int {
     mut things := map[int]int{}
 
-    for i ,x in list_of_numbers {
+    for i, x in list_of_numbers {
         complement := target - x
         if complement in things {
             return [things[complement], i]
