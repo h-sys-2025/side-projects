@@ -156,11 +156,15 @@ fn gen_dev_docs(content []string) Documentation {
         next_line: for lline in chunk {
             mut is_public := false
             llline := lline.trim_space()
+            mut line := ""
+
             if llline.starts_with("pub ") {
                 is_public = true
+                line = llline.split(" ")[1..].join(" ")
+            } else {
+                line = llline
             }
 
-            line := llline.split(" ")[1..].join(" ")
 
             if line.starts_with('//@') {
                 dev_docs << line
