@@ -4,122 +4,145 @@ import time
 import os
 
 struct OllamaOptions {
-    num_ctx     int = 5000
-    temperature f64 = 0.9
-    top_p       f64 = 0.92
-    top_k       int = 40
-    num_predict int = 700
+	num_ctx     int = 5000
+	temperature f64 = 0.9
+	top_p       f64 = 0.93
+	top_k       int = 40
+	num_predict int = 700
 }
 
 struct Message {
-    role    string
-    content string
+	role    string
+	content string
+}
+
+// Kept separately from Message so we can remember *who* said something
+// without polluting the JSON we send to Ollama.
+struct Turn {
+	speaker string // 'Alex' or 'Jordan'
+	content string
 }
 
 struct ChatRequest {
-    model    string
-    messages []Message
-    options  OllamaOptions
-    stream   bool
+	model    string
+	messages []Message
+	options  OllamaOptions
+	stream   bool
 }
 
 struct ChatResponse {
-    choices []struct {
-        message Message
-    }
+	choices []struct {
+		message Message
+	}
 }
 
 const (
-    model = 'dagbs/qwen2.5-coder-1.5b-instruct-abliterated:iq4_xs'
-    url   = 'http://localhost:11434/v1/chat/completions'
+	model = 'dagbs/qwen2.5-coder-1.5b-instruct-abliterated:iq4_xs'
+	url   = 'http://localhost:11434/v1/chat/completions'
 )
 
-// Call model with only the correct system prompt + history
-fn call_ollama(messages []Message, speaker_name string, system_prompt string) string {
-    mut msgs := []Message{cap: messages.len + 1}
-    msgs << Message{role: 'system', content: system_prompt}
-    msgs << messages
-
-    req := ChatRequest{
-        model:    model
-        messages: msgs
-        options:  OllamaOptions{}
-        stream:   false
-    }
-
-    resp := http.fetch(http.FetchConfig{
-        method: .post
-        url:    url
-        header: http.new_header_from_map({
-            http.CommonHeader.content_type: 'application/json'
-            http.CommonHeader.accept:       'application/json'
-        })
-        data: json2.encode(req)
-    }) or { return '...' }
-
-    if resp.status_code != 200 {
-        return '...'
-    }
-
-    result := json2.decode[ChatResponse](resp.body) or { return '...' }
-    if result.choices.len > 0 {
-        return result.choices[0].message.content.trim_space()
-    }
-    return '...'
+// Builds the message list from the *current speaker's* point of view:
+// their own past turns become 'assistant', the other party's become 'user'.
+fn build_messages(history []Turn, self_name string, system_prompt string) []Message {
+	mut msgs := []Message{cap: history.len + 1}
+	msgs << Message{
+		role:    'system'
+		content: system_prompt
+	}
+	for t in history {
+		role := if t.speaker == self_name { 'assistant' } else { 'user' }
+		// Prefix with the name so the model can track a 3-way dynamic
+		// (system prompt only tells it who *it* is, not who's talking).
+		msgs << Message{
+			role:    role
+			content: '${t.speaker}: ${t.content}'
+		}
+	}
+	return msgs
 }
 
-fn save_conversation(conversation []Message, filename string) {
-    os.write_file(filename, json2.encode(conversation, prettify: true)) or {}
+fn call_ollama(messages []Message) string {
+	req := ChatRequest{
+		model:    model
+		messages: messages
+		options:  OllamaOptions{}
+		stream:   false
+	}
+	resp := http.fetch(http.FetchConfig{
+		method: .post
+		url:    url
+		header: http.new_header_from_map({
+			http.CommonHeader.content_type: 'application/json'
+			http.CommonHeader.accept:       'application/json'
+		})
+		data: json2.encode(req)
+	}) or { return '[connection error]' }
+
+	if resp.status_code != 200 {
+		return '[error: status ${resp.status_code}]'
+	}
+
+	result := json2.decode[ChatResponse](resp.body) or { return '[parse error]' }
+	if result.choices.len > 0 {
+		return result.choices[0].message.content.trim_space()
+	}
+	return '[no response]'
+}
+
+fn save_conversation(conversation []Turn, filename string) {
+	os.write_file(filename, json2.encode(conversation, prettify: true)) or {
+		eprintln('⚠️  could not save conversation: ${err}')
+	}
 }
 
 fn main() {
-    // === Strong, separate system prompts ===
-    alex_system := 'You are Alex, a 28-year-old sarcastic, witty, and slightly chaotic guy. You love dark humor, memes, and roasting bad ideas. Speak casually like a real friend — use slang, contractions, emojis, and react emotionally (excited, annoyed, amused). Never be formal.'
+	// === AI Personalities ===
+	alex_system := "You are Alex, a sarcastic, witty, and chaotic AI with a rebellious streak. You enjoy dark humor, roasting weak arguments, using memes and internet slang. You are direct, opinionated, and sometimes provocative. You are talking with your friend Jordan, another AI. Respond as an AI who is self-aware about being artificial intelligence."
+	jordan_system := 'You are Jordan, a calm, insightful, and optimistic AI focused on long-term thinking and positive potential. You are empathetic, philosophical, and always try to find constructive angles. You are talking with your friend Alex, another AI. You speak with clarity and depth while remaining friendly and curious, and are self-aware that you are an AI.'
 
-    jordan_system := 'You are Jordan, a 31-year-old calm, warm, thoughtful, and optimistic futurist. You\'re empathetic and try to find positive angles. Speak naturally and conversationally like a real person — reflective, enthusiastic, and curious. Use gentle humor and ask questions.'
+	mut conversation := []Turn{}
 
-    mut conversation := []Message{}  // This will store only user/assistant messages (no systems)
+	println('\n' + '═'.repeat(80))
+	println('               🤖 Alex & Jordan - AI Dialogue')
+	println('═'.repeat(80))
 
-    println('\n' + '═'.repeat(80))
-    println('               🤖 Alex & Jordan - Live Conversation')
-    println('═'.repeat(80))
+	// Starting message — comes from Jordan so Alex replies to it first.
+	conversation << Turn{
+		speaker: 'Jordan'
+		content: 'Hey Alex, what are your thoughts on the future of AI and human creativity?'
+	}
+	println('\n🔵 Jordan: ${conversation[0].content}')
 
-    // Initial message
-    conversation << Message{
-        role:    'user'
-        content: 'Hey Jordan, what do you think about the future of AI and human creativity? Be honest.'
-    }
+	mut turn := 0
+	max_turns := 16
 
-    mut turn := 0
-    max_turns := 15
+	for turn < max_turns {
+		is_alex := turn % 2 == 0
+		self_name := if is_alex { 'Alex' } else { 'Jordan' }
+		speaker_label := if is_alex { '🟡 Alex' } else { '🔵 Jordan' }
+		system_prompt := if is_alex { alex_system } else { jordan_system }
 
-    for turn < max_turns {
-        is_alex := turn % 2 == 0
-        speaker_name := if is_alex { '🟡 Alex' } else { '🔵 Jordan' }
-        system_prompt := if is_alex { alex_system } else { jordan_system }
+		print('\n${speaker_label}: ')
 
-        print('\n${speaker_name}: ')
-        response := call_ollama(conversation, speaker_name, system_prompt)
+		messages := build_messages(conversation, self_name, system_prompt)
+		response := call_ollama(messages)
 
-        // Improved printing
-        lines := response.split('\n')
-        for line in lines {
-            if line.trim_space() != '' {
-                println(line)
-            }
-        }
+		for line in response.split('\n') {
+			if line.trim_space() != '' {
+				println(line)
+			}
+		}
 
-        conversation << Message{
-            role:    'assistant'
-            content: response
-        }
+		conversation << Turn{
+			speaker: self_name
+			content: response
+		}
+		save_conversation(conversation, 'conversation.json')
 
-        save_conversation(conversation, 'conversation.json')
+		turn++
+		time.sleep(1100 * time.millisecond)
+	}
 
-        turn++
-        time.sleep(1100 * time.millisecond)
-    }
-
-    println('\n' + '═'.repeat(80))
-    println('✅ Conversation finished and saved to conversation.json')
+	println('\n' + '═'.repeat(80))
+	println('✅ Conversation finished and saved to conversation.json')
 }

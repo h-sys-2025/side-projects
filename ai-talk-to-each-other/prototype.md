@@ -21,7 +21,7 @@ const (
 ```v
 //PRIVATE
 
-fn call_ollama(messages []Message, persona_name string) string {
+fn call_ollama(messages []Message, speaker_name string, system_prompt string) string {
 ```
 ```v
 //PRIVATE
@@ -49,11 +49,6 @@ struct Message {
 //PRIVATE
 
 struct ChatRequest {
-```
-```v
-//PRIVATE
-
-struct Choice {
 ```
 ```v
 //PRIVATE
