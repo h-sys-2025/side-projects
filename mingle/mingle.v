@@ -195,9 +195,12 @@ fn autodoc_and_commit(dir_path string, commit_all bool) []string {
     } else {
         _ := os.exec(["git","add","."])
         all_files := get_all_files(dir_path)
-        for file in all_files {
+        next_file: for file in all_files {
             file_path_x := file
             println(" _+_ modified: ${file_path_x} _+_")
+            if file_path_x.starts_with(".") {
+                continue next_file
+            }
             if file_path_x.ends_with(".v") {
                 println(" _!_ seemds to be a .v file! _!_")
                 println(" _+_ autodoc: ${file_path_x} _+_")
