@@ -6,6 +6,9 @@
 ```v
 import bpe
 import os
+import rand
+import json
+import math
 ```
 
 ## Constants:
@@ -34,4 +37,24 @@ fn format(data string) []string {
 ```v
 // helper function: format and save to a file!
 fn format_and_save(data string, formatted_file string) {
+```
+```v
+// this function generates a markov-chain model with order (for markov chain)
+//
+// a little vibecoding never hurtes anyone: Generates Order-N Model using single string keys (e.g., "a|b|c")
+//
+fn build_model(tokens []string, order int) map[string]map[string]f64 {
+```
+```v
+// for markov chain
+// predict_n: Main prediction function with backoff and multi-token support
+fn predict_n(model map[string]map[string]f64, prompt string, n int, temperature f64) []string {
+```
+```v
+// get_next_with_backoff: Variable order backoff
+fn get_next_with_backoff(model map[string]map[string]f64, context string, temperature f64) string {
+```
+```v
+// sample_with_temperature: Temperature sampling
+fn sample_with_temperature(dist map[string]f64, temperature f64) string {
 ```
