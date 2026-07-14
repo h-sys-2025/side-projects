@@ -5,10 +5,10 @@ import os
 
 struct OllamaOptions {
     num_ctx     int = 5000
-    temperature f64 = 0.85
-    top_p       f64 = 0.9
+    temperature f64 = 0.9
+    top_p       f64 = 0.92
     top_k       int = 40
-    num_predict int = 512
+    num_predict int = 700
 }
 
 struct Message {
@@ -23,12 +23,10 @@ struct ChatRequest {
     stream   bool
 }
 
-struct Choice {
-    message Message
-}
-
 struct ChatResponse {
-    choices []Choice
+    choices []struct {
+        message Message
+    }
 }
 
 const (
@@ -36,91 +34,81 @@ const (
     url   = 'http://localhost:11434/v1/chat/completions'
 )
 
-fn call_ollama(messages []Message, persona_name string) string {
-    opts := OllamaOptions{}
+// Call model with only the correct system prompt + history
+fn call_ollama(messages []Message, speaker_name string, system_prompt string) string {
+    mut msgs := []Message{cap: messages.len + 1}
+    msgs << Message{role: 'system', content: system_prompt}
+    msgs << messages
 
     req := ChatRequest{
         model:    model
-        messages: messages
-        options:  opts
+        messages: msgs
+        options:  OllamaOptions{}
         stream:   false
     }
 
-    payload := json2.encode(req)
-
-    headers := http.new_header_from_map({
-        http.CommonHeader.content_type: 'application/json'
-        http.CommonHeader.accept:       'application/json'
-    })
-
-    conf := http.FetchConfig{
+    resp := http.fetch(http.FetchConfig{
         method: .post
         url:    url
-        header: headers
-        data:   payload
-    }
-
-    resp := http.fetch(conf) or {
-        eprintln('${persona_name} request failed: ${err}')
-        return 'Sorry, I had an error.'
-    }
+        header: http.new_header_from_map({
+            http.CommonHeader.content_type: 'application/json'
+            http.CommonHeader.accept:       'application/json'
+        })
+        data: json2.encode(req)
+    }) or { return '...' }
 
     if resp.status_code != 200 {
-        eprintln('${persona_name} error ${resp.status_code}')
-        return 'I encountered an error.'
+        return '...'
     }
 
-    result := json2.decode[ChatResponse](resp.body) or {
-        eprintln('${persona_name} JSON decode error')
-        return 'Sorry, parsing error.'
-    }
-
+    result := json2.decode[ChatResponse](resp.body) or { return '...' }
     if result.choices.len > 0 {
         return result.choices[0].message.content.trim_space()
     }
-    return 'No response.'
+    return '...'
 }
 
 fn save_conversation(conversation []Message, filename string) {
-    data := json2.encode(conversation, prettify: true)
-    os.write_file(filename, data) or { eprintln('Failed to save conversation: ${err}') }
+    os.write_file(filename, json2.encode(conversation, prettify: true)) or {}
 }
 
 fn main() {
-    mut conversation := []Message{}
+    // === Strong, separate system prompts ===
+    alex_system := 'You are Alex, a 28-year-old sarcastic, witty, and slightly chaotic guy. You love dark humor, memes, and roasting bad ideas. Speak casually like a real friend — use slang, contractions, emojis, and react emotionally (excited, annoyed, amused). Never be formal.'
 
-    // === Personas ===
-    conversation << Message{
-        role:    'system'
-        content: 'You are Alex, a witty, sarcastic, and slightly chaotic philosopher who loves debating ideas with humor.'
-    }
+    jordan_system := 'You are Jordan, a 31-year-old calm, warm, thoughtful, and optimistic futurist. You\'re empathetic and try to find positive angles. Speak naturally and conversationally like a real person — reflective, enthusiastic, and curious. Use gentle humor and ask questions.'
 
-    conversation << Message{
-        role:    'system'
-        content: 'You are Jordan, a calm, deeply insightful, and optimistic futurist who always tries to find common ground and positive outcomes.'
-    }
+    mut conversation := []Message{}  // This will store only user/assistant messages (no systems)
 
-    println('🤖 Starting conversation between Alex and Jordan...\n')
+    println('\n' + '═'.repeat(80))
+    println('               🤖 Alex & Jordan - Live Conversation')
     println('═'.repeat(80))
 
-    mut turn := 0
-    max_turns := 20
-
-    // Initial prompt
+    // Initial message
     conversation << Message{
         role:    'user'
-        content: 'Start a conversation with Jordan about the future of artificial intelligence and human creativity.'
+        content: 'Hey Jordan, what do you think about the future of AI and human creativity? Be honest.'
     }
 
+    mut turn := 0
+    max_turns := 15
+
     for turn < max_turns {
-        current_speaker := if turn % 2 == 0 { 'Alex' } else { 'Jordan' }
+        is_alex := turn % 2 == 0
+        speaker_name := if is_alex { '🟡 Alex' } else { '🔵 Jordan' }
+        system_prompt := if is_alex { alex_system } else { jordan_system }
 
-        print('\n${current_speaker}: ')
-        response := call_ollama(conversation, current_speaker)
+        print('\n${speaker_name}: ')
+        response := call_ollama(conversation, speaker_name, system_prompt)
 
-        println(response)
+        // Improved printing
+        lines := response.split('\n')
+        for line in lines {
+            if line.trim_space() != '' {
+                println(line)
+            }
+        }
 
-        // Add response to history
         conversation << Message{
             role:    'assistant'
             content: response
@@ -129,9 +117,9 @@ fn main() {
         save_conversation(conversation, 'conversation.json')
 
         turn++
-        time.sleep(800 * time.millisecond)
+        time.sleep(1100 * time.millisecond)
     }
 
-    println('\n═'.repeat(80))
-    println('✅ Conversation finished! Saved to conversation.json')
+    println('\n' + '═'.repeat(80))
+    println('✅ Conversation finished and saved to conversation.json')
 }
