@@ -197,12 +197,12 @@ fn autodoc_and_commit(dir_path string, commit_all bool) []string {
         all_files := get_all_files(dir_path)
         next_file: for file in all_files {
             file_path_x := file
-            println(" _+_ modified: ${file_path_x} _+_")
             if file_path_x.starts_with(".") {
                 continue next_file
             }
+            println(" _+_ modified: ${file_path_x} _+_")
             if file_path_x.ends_with(".v") {
-                println(" _!_ seemds to be a .v file! _!_")
+                println(" _!_ seems to be a .v file! _!_")
                 println(" _+_ autodoc: ${file_path_x} _+_")
                 command := [autodoc_bin_path,file_path_x]
                 cmd := os.exec(command)
