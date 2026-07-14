@@ -73,8 +73,6 @@ fn main() {
         return "${x}1111"
     })
 
-    // being honest, thats only what I wanted to implement!
-
     // now lets try to convert!
     mut nnames := names.convert_map[[]string](fn(x string) []string {
         return x.split("")
