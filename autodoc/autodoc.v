@@ -10,6 +10,7 @@ pub mut:
     kind     string
     dev_docs []string
     code_ref string
+    is_public bool
 }
 
 //@ this is main Documentation object
@@ -78,6 +79,11 @@ fn doc_to_md(docs Documentation) string {
     for stmt in docs.stmts {
         // doc_md = '${doc_md}\n${stmt.dev_docs.join('\n').replace('//@', '##')}\n```v\n${stmt.code_ref}\n```\n'
         name := stmt.kind
+        mut public := "private"
+        if stmt.is_public == true {
+            public = "public"
+        }
+
         if name == 'module' {
             if module_name == '' {
                 module_name = stmt.code_ref.split(' ')[1]
@@ -87,13 +93,13 @@ fn doc_to_md(docs Documentation) string {
             if stmt.dev_docs.len > 0 {
                 dev_docs = '\n${stmt.dev_docs.join('\n').replace('//@', '//')}'
             }
-            my_functions = '${my_functions}```v${dev_docs}\n${stmt.code_ref}\n```\n'
+            my_functions = '${my_functions}```v\n//${public.to_upper()}\n${dev_docs}\n${stmt.code_ref}\n```\n'
         } else if name == 'struct' {
             mut dev_docs := ''
             if stmt.dev_docs.len > 0 {
                 dev_docs = '\n${stmt.dev_docs.join('\n').replace('//@', '//')}'
             }
-            my_structs = '${my_structs}```v${dev_docs}\n${stmt.code_ref}\n```\n'
+            my_structs = '${my_structs}```v\n//${public.to_upper()}\n${dev_docs}\n${stmt.code_ref}\n```\n'
         } else if name == 'import' {
             mut dev_docs := ''
             if stmt.dev_docs.len > 0 {
@@ -105,7 +111,7 @@ fn doc_to_md(docs Documentation) string {
             if stmt.dev_docs.len > 0 {
                 dev_docs = '\n${stmt.dev_docs.join('\n').replace('//@', '//')}'
             }
-            my_constants = '${my_constants}${dev_docs}\n${stmt.code_ref}'
+            my_constants = '${my_constants}\n//${public.to_upper()}\n${dev_docs}\n${stmt.code_ref}'
         }
     }
 
@@ -148,7 +154,14 @@ fn gen_dev_docs(content []string) Documentation {
     mut dev_docs := []string{}
     for chunk in chunks { // read first 100 lines of file.
         next_line: for lline in chunk {
-            line := lline.trim_space()
+            mut is_public := false
+            llline := lline.trim_space()
+            if llline.starts_with("pub ") {
+                is_public = true
+            }
+
+            line := llline.split(" ")[1..].join(" ")
+
             if line.starts_with('//@') {
                 dev_docs << line
                 continue next_line
@@ -158,6 +171,7 @@ fn gen_dev_docs(content []string) Documentation {
                     kind:     'fn'
                     dev_docs: dev_docs
                     code_ref: line
+                    is_public: is_public
                 }
                 dev_docs = []string{}
                 continue next_line
@@ -167,6 +181,7 @@ fn gen_dev_docs(content []string) Documentation {
                     kind:     'struct'
                     dev_docs: dev_docs
                     code_ref: line
+                    is_public: is_public
                 }
                 dev_docs = []string{}
                 continue next_line
@@ -176,6 +191,7 @@ fn gen_dev_docs(content []string) Documentation {
                     kind:     'module'
                     dev_docs: dev_docs
                     code_ref: line
+                    is_public: is_public
                 }
                 dev_docs = []string{}
                 continue next_line
@@ -185,6 +201,7 @@ fn gen_dev_docs(content []string) Documentation {
                     kind:     'import'
                     dev_docs: dev_docs
                     code_ref: line
+                    is_public: is_public
                 }
                 dev_docs = []string{}
                 continue next_line
@@ -194,6 +211,7 @@ fn gen_dev_docs(content []string) Documentation {
                     kind:     'const'
                     dev_docs: dev_docs
                     code_ref: line
+                    is_public: is_public
                 }
                 dev_docs = []string{}
                 continue next_line
