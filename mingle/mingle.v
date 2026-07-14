@@ -40,6 +40,12 @@ fn main() {
     bin_path := os.executable()
     dir_path := os.join_path(os.dir(bin_path), "..")
 
+    mut commit_all := false
+    if arguments()[1] == "yas" {
+        commit_all = true
+    }
+
+
     os.chdir(dir_path) or {
         println("Error changing directory: ${err}")
         return
@@ -93,7 +99,7 @@ fn main() {
     }
 
     // if not then: `git add $dir && git commit -m "mingle: autocommit"`
-    _ := autodoc_and_commit(dir_path)
+    _ := autodoc_and_commit(dir_path, commit_all)
 
     // now git push origin master
     command := ["git","push","origin","master"]
@@ -150,40 +156,79 @@ fn find_and_autodoc_v_files(side_proj string) {
 
 //@ this function uses advanced strng manipulation to
 //@ get the dirs which we need to commit!
-fn autodoc_and_commit(dir_path string) []string {
+fn autodoc_and_commit(dir_path string, commit_all bool) []string {
     autodoc_bin_path := os.join_path(dir_path, ".","autodoc","autodoc")
 
     mut dirs := []string{}
 
-    git_status := os.exec(["git","status"])
-    // test: println(git_status)
-    //--
-    u1 := git_status.output.split("\n")
-    for u2 in u1 {
-        line := u2.trim_space()
-        lline := line.split(" ")
+    if commit_all != true {
+        git_status := os.exec(["git","status"])
+        // test: println(git_status)
+        //--
+        u1 := git_status.output.split("\n")
+        for u2 in u1 {
+            line := u2.trim_space()
+            lline := line.split(" ")
 
-        for u3 in 0..lline.len {
-            u4 := lline[u3]
-            if u4 == "modified:" {
-                u5 := lline[u3+3]
-                dirs << u5
-                file_path_x := os.join_path(dir_path,".",u5)
-                println(" _+_ modified: ${file_path_x} _+_")
-                if file_path_x.ends_with(".v") {
-                    println(" _!_ seemds to be a .v file! _!_")
-                    println(" _+_ autodoc: ${file_path_x} _+_")
-                    command := [autodoc_bin_path,file_path_x]
-                    cmd := os.exec(command)
-                    if cmd.exit_code != 0 {
-                        println(" !!! failed: ${cmd.output}")
-                    } else {
-                        println(" -+- generated docs!")
+            for u3 in 0..lline.len {
+                u4 := lline[u3]
+                if u4 == "modified:" {
+                    u5 := lline[u3+3]
+                    dirs << u5
+                    file_path_x := os.join_path(dir_path,".",u5)
+                    println(" _+_ modified: ${file_path_x} _+_")
+                    if file_path_x.ends_with(".v") {
+                        println(" _!_ seemds to be a .v file! _!_")
+                        println(" _+_ autodoc: ${file_path_x} _+_")
+                        command := [autodoc_bin_path,file_path_x]
+                        cmd := os.exec(command)
+                        if cmd.exit_code != 0 {
+                            println(" !!! failed: ${cmd.output}")
+                        } else {
+                            println(" -+- generated docs!")
+                        }
                     }
+                    add_all_and_commit("mingle-v2: ${time.now()}",file_path_x)
                 }
-                add_all_and_commit("mingle-v2: ${time.now()}",file_path_x)
             }
+        }
+    } else {
+        _ := os.exec(["git","add","."])
+        all_files := get_all_files(dir_path)
+        for file in all_files {
+            file_path_x := file
+            println(" _+_ modified: ${file_path_x} _+_")
+            if file_path_x.ends_with(".v") {
+                println(" _!_ seemds to be a .v file! _!_")
+                println(" _+_ autodoc: ${file_path_x} _+_")
+                command := [autodoc_bin_path,file_path_x]
+                cmd := os.exec(command)
+                if cmd.exit_code != 0 {
+                    println(" !!! failed: ${cmd.output}")
+                } else {
+                    println(" -+- generated docs!")
+                }
+            }
+            add_all_and_commit("mingle-v2: ${time.now()}",file_path_x)
         }
     }
     return dirs
+}
+
+//@ gets all files
+fn get_all_files(dir_path string) []string {
+    mut all_files := []string{}
+    items := os.ls(dir_path) or {
+        return all_files
+    }
+    for item in items {
+        if os.is_file(item) {
+            all_files << os.join_path(dir_path,item)
+        } else {
+            for x in get_all_files(os.join_path(dir_path,".",item)) {
+                all_files << x
+            }
+        }
+    }
+    return all_files
 }
