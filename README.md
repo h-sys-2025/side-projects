@@ -9,6 +9,7 @@
 
 ## `2. Only use V-language`
 > *(because `v` is goat!)*
+> *`C`* is also allowed!
 
 ### This repo has its own custom project manger *`mingle`*.
 - It also generates docmentations (using *`autodoc`*).
