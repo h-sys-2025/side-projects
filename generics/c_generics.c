@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 typedef enum { I64, I32, F64, F32, STRING } Type;
 
@@ -69,6 +70,8 @@ const char* type_name(Type t) {
     } \
 } while(0)
 
+
+// function using type `Any`.
 Any add(Any a, Any b) {
     // For demo: promote everything to double
     double x = cast_any(a);
@@ -77,6 +80,33 @@ Any add(Any a, Any b) {
     result = x + y;
     return (Any){ .data = &result, .type = F64 };
 }
+
+// raw skell-iton of generics //
+
+#define fn(name, ...) \
+Any name(__VA_ARGS__)
+
+#define PANIC(...) fprintf(stderr, "PANIC: %s:%d - %s\n", __FILE__, __LINE__, __VA_ARGS__);
+
+#define type_check(A,B) if ((A).type != (B).type) { PANIC("type_check: runtime type-mismatch!"); }
+#define type_check_abort(A,B) if ((A).type != (B).type) { PANIC("type_check: runtime type-mismatch!"); abort(); }
+
+#define type(A) (A).type
+
+//--//
+
+// Defines: Any mult(Any a, Any b)
+// this is hard, I will continue sometime later! (I hope)
+fn(mult, Any a, Any b) {
+    // test: type_check_abort(a, b);
+    type_check(a, b); // just tell the user that he did something wrong!
+    double x = cast_any(a);
+    double y = cast_any(b);
+    static double result;
+    result = x * y;
+    return (Any){ .data = &result, .type = type(a) };
+}
+
 
 int main(void) {
     Any pi   = var(F64, 22.0/7.0);
@@ -92,10 +122,13 @@ int main(void) {
     _type(F64) d_val = cast(pi, _type(F64));
     _type(I32) i_val = cast(count, _type(I32));
 
-    printf("\nCalculation: %f + 10 = %f\n", d_val, d_val + 10.0);
+    printf("\nCalculation: %f + %d = %f\n", d_val, i_val, d_val + i_val );
 
     Any sum = add(pi, count);
     print_any(sum);
+
+    Any some = mult(pi,count);
+    print_any(some);
 
     return 0;
 }
