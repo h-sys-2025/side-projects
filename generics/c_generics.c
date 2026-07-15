@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-typedef enum { I64, I32, F64, F32, STRING } Type;
+typedef enum { I64, I32, DOUBLE, FLOAT, STRING } Type;
 
 typedef struct {
     void* data;
@@ -11,10 +11,10 @@ typedef struct {
 
 #define _type(t) _type_##t
 
-#define _type_I64   int64_t
-#define _type_I32   int32_t
-#define _type_F64   double
-#define _type_F32   float
+#define _type_I64    int64_t
+#define _type_I32    int32_t
+#define _type_DOUBLE double
+#define _type_FLOAT  float
 #define _type_STRING const char*
 
 #define var(TYP, VAL) ({ \
