@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
-typedef enum { i64, i32, f64, f32 } typetype;
+typedef enum { i64, i32, f64, f32, string } typetype;
 
 typedef struct {
     void* data;
@@ -26,8 +26,11 @@ typedef struct {
 
 const char* typen(typetype t) {
     switch (t) {
-        case i64: return "i64"; case i32: return "i32";
-        case f64: return "f64"; case f32: return "f32";
+        case i64: return "i64";
+        case i32: return "i32";
+        case f64: return "f64";
+        case f32: return "f32";
+        case string: return "char[]";
         default:  return "unknown";
     }
 }
@@ -76,7 +79,7 @@ int main() {
     print_any(big);
 
     // get the value for math, we must say the type we want!
-    double d_val = cast_any_as(pi, double);
+    double d_val = cast_any(pi);
     int i_val = cast_any_as(count, int);
 
     printf("Calculation: %f + 10 = %f\n", d_val, d_val + 10.0);
