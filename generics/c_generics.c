@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <assert.h>
 
 typedef enum { I64, I32, F64, F32, STRING } Type;
 
 typedef struct {
-    void* data;
-    Type  type;
+    const void* data;   // Changed to const void*
+    Type type;
 } Any;
 
 #define _type(t) _type_##t
@@ -17,9 +18,11 @@ typedef struct {
 #define _type_F32   float
 #define _type_STRING const char*
 
-#define var(TYP, VAL) ({ \
-    static __typeof__(VAL) _val_##__LINE__ = (VAL); \
-    (Any){ .data = &_val_##__LINE__, .type = TYP }; \
+#define var(TYP, VAL) _VAR_IMPL(TYP, VAL, __COUNTER__)
+
+#define _VAR_IMPL(TYP, VAL, CNT) ({ \
+    __typeof__(VAL) _val_##CNT = (VAL); \
+    (Any){ .data = &_val_##CNT, .type = TYP }; \
 })
 
 #define cast(A, TYPE) (*(TYPE*)((A).data))
@@ -83,9 +86,6 @@ Any add(Any a, Any b) {
 
 // raw skell-iton of generics //
 
-#define fn(name, ...) \
-Any name(__VA_ARGS__)
-
 #define PANIC(...) fprintf(stderr, "PANIC: %s:%d - %s\n", __FILE__, __LINE__, __VA_ARGS__);
 
 #define type_check(A,B) if ((A).type != (B).type) { PANIC("type_check: runtime type-mismatch!"); }
@@ -95,9 +95,8 @@ Any name(__VA_ARGS__)
 
 //--//
 
-// Defines: Any mult(Any a, Any b)
 // this is hard, I will continue sometime later! (I hope)
-fn (mult, Any a, Any b) {
+Any mult(Any a, Any b) {
     // test: type_check_abort(a, b);
     type_check(a, b); // just tell the user that he did something wrong!
     double x = cast_any(a);
@@ -107,6 +106,38 @@ fn (mult, Any a, Any b) {
     return (Any){ .data = &result, .type = type(a) };
 }
 
+// more things //
+
+#define fn(X) (Any aargs[X])
+#define ret(...) (Any){__VA_ARGS__}
+#define init_args(X) int32_t ttop = X; int32_t mmax = X;
+
+Any shift_args(Any argv[], int32_t argc) {
+    assert(argc > 0 && "Cannot shift from empty list");
+
+    Any elem = argv[argc];
+    return elem;         // Return the saved element
+}
+
+#define shift shift_args(aargs, ttop); ttop--;
+
+Any addittion fn(2) {
+    init_args(2);
+    Any x = shift;
+    Any y = shift;
+
+    static double xx, yy;
+    xx = cast_any(x);
+    yy = cast_any(y);
+
+    const double zz = xx + yy;
+
+    return var(F64, zz);
+}
+
+#define call(X,...) X([__VA_ARGS__]);
+
+//--//
 
 int main(void) {
     Any pi   = var(F64, 22.0/7.0);
@@ -129,6 +160,14 @@ int main(void) {
 
     Any some = mult(pi,count);
     print_any(some);
+
+    //Any whatever = call(divide, sum, some);
+    Any la_list[2];
+    la_list[0] = var(F64, 1000);
+    la_list[1] = var(F64, 3);
+    Any whatever2 = addittion(la_list);
+
+    print_any(whatever2);
 
     return 0;
 }
