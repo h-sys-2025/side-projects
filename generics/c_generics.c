@@ -22,7 +22,7 @@ typedef struct {
 
 #define _VAR_IMPL(TYP, VAL, CNT) ({ \
     __typeof__(VAL) _val_##CNT = (VAL); \
-    (Any){ .data = &_val_##CNT, .type = TYP }; \
+    (Any){ .data = (const void*)&_val_##CNT, .type = TYP }; \
 })
 
 #define cast(A, TYPE) (*(TYPE*)((A).data))
@@ -110,7 +110,7 @@ Any mult(Any a, Any b) {
 
 #define fn(X) (Any aargs[X])
 #define ret(...) (Any){__VA_ARGS__}
-#define init_args(X) int32_t ttop = X; int32_t mmax = X;
+#define init_args(X) int32_t ttop = (X); (void)ttop; /* int32_t mmax = (X); */
 
 Any shift_args(Any argv[], int32_t argc) {
     assert(argc > 0 && "Cannot shift from empty list");
