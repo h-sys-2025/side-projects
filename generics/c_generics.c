@@ -191,7 +191,9 @@ any add(ttype GType, any a, any b) {
     case f64:
       result.value.f64 = a.value.f64 + b.value.f64;
       break;
-    // Add more types later...
+    case f32:
+      result.value.f64 = a.value.f32 + b.value.f32;
+      break;
     default:
       printf("add not implemented for type %s\n", repr(GType));
       abort();
@@ -202,8 +204,12 @@ any add(ttype GType, any a, any b) {
 // end //////////
 int main(void);
 int main(void) {
-  any x = add(f64, to_f64(35.1), to_f64(33.9));
-  println("answer is {:?}", x);
+  any y = to_f64(35.0);
+  any z = to_f64(34.0);
+
+  any x = add(f64, y, z);
+
+  println("{:?} + {:?} = {:?}", y, z, x);
   println("hello sailor! pi is approx {:?}", to_f64(22.0/7.0));
   return 0;
 }
