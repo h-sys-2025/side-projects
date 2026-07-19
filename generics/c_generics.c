@@ -21,18 +21,25 @@ typedef enum {
 } ttype;
 
 typedef struct {
-  const void* data;
-  ttype _type;
+    ttype _type;
+    union {
+        int32_t  i32;
+        int64_t  i64;
+        uint32_t u32;
+        uint64_t u64;
+        float    f32;
+        double   f64;
+    } value;
 } any_t;
 #define any any_t
 
 // macros for casts or whatever //
-#define to_f64(X) (any_t){._type = f64, .data = (void*)(uintptr_t)(double)(X)}
-#define to_f32(X) (any_t){._type = f32, .data = (void*)(uintptr_t)(float)(X)}
-#define to_u32(X) (any_t){._type = u32, .data = (void*)(uintptr_t)(uint32_t)(X)}
-#define to_u64(X) (any_t){._type = u64, .data = (void*)(uintptr_t)(uint64_t)(X)}
-#define to_i32(X) (any_t){._type = i32, .data = (void*)(uintptr_t)(int32_t)(X)}
-#define to_i64(X) (any_t){._type = i64, .data = (void*)(uintptr_t)(int64_t)(X)}
+#define to_f64(X) (any_t){._type = f64, .value.f64 = (X)}
+#define to_f32(X) (any_t){._type = f32, .value.f32 = (X)}
+#define to_u32(X) (any_t){._type = u32, .value.u32 = (X)}
+#define to_u64(X) (any_t){._type = u64, .value.u64 = (X)}
+#define to_i32(X) (any_t){._type = i32, .value.i32 = (X)}
+#define to_i64(X) (any_t){._type = i64, .value.i64 = (X)}
 // -- //
 
 // macros for generic typechecks //
@@ -149,26 +156,13 @@ void pprintln(const char* format, any items[]) {
             any item = items[item_idx];
 
             switch (item._type) {
-                case i32:
-                    printf("%d", *(int32_t*)&item.data);
-                    break;
-                case i64:
-                    printf("%ld", *(int64_t*)&item.data);
-                    break;
-                case u32:
-                    printf("%u", *(uint32_t*)&item.data);
-                    break;
-                case u64:
-                    printf("%lu", *(uint64_t*)&item.data);
-                    break;
-                case f32:
-                    printf("%f", *(float*)&item.data);
-                    break;
-                case f64:
-                    printf("%f", *(double*)&item.data);
-                    break;
-                default:
-                    printf("<unknown:%s>", repr(item._type));
+                case i32: printf("%d",   item.value.i32); break;
+                case i64: printf("%ld",  item.value.i64); break;
+                case u32: printf("%u",   item.value.u32); break;
+                case u64: printf("%lu",  item.value.u64); break;
+                case f32: printf("%f",   item.value.f32); break;
+                case f64: printf("%f",   item.value.f64); break;
+                default:  printf("<unknown>");
             }
             item_idx++;
         }
@@ -188,31 +182,28 @@ void pprintln(const char* format, any items[]) {
  */
 
 any add(ttype GType, any a, any b) {
-    typecheck(GType, a);
-    typecheck(GType, b);
+  typecheck(GType, a);
+  typecheck(GType, b);
 
-    any result = {._type = GType};
+  any result = {._type = GType};
 
-    switch (GType) {
-        case f64:
-            {
-                double sum = *(double*)a.data + *(double*)b.data;
-                *(double*)&result.data = sum;          // Correct way
-            }
-            break;
-        // Add more types later...
-        default:
-            printf("add not implemented for type %s\n", repr(GType));
-            abort();
-    }
-    return result;
+  switch (GType) {
+    case f64:
+      result.value.f64 = a.value.f64 + b.value.f64;
+      break;
+    // Add more types later...
+    default:
+      printf("add not implemented for type %s\n", repr(GType));
+      abort();
+  }
+  return result;
 }
 
 // end //////////
 int main(void);
 int main(void) {
-    any x = add(f64, to_f64(35.1), to_f64(33.9));
-    println("answer is {:?}", x);
-    println("hello sailor! pi is approx {:?}", to_f64(22.0/7.0));
-    return 0;
+  any x = add(f64, to_f64(35.1), to_f64(33.9));
+  println("answer is {:?}", x);
+  println("hello sailor! pi is approx {:?}", to_f64(22.0/7.0));
+  return 0;
 }
