@@ -21,27 +21,18 @@ typedef enum {
 } ttype;
 
 typedef struct {
-  union {
-    float f32;
-    double f64;
-
-    int32_t i32;
-    int64_t i64;
-
-    uint32_t u32;
-    uint64_t u64;
-  };
+  const void* data;
   ttype _type;
 } any_t;
 #define any any_t
 
 // macros for casts or whatever //
-#define f64(X) (any_t){._type = f64, .f64 = (X)}
-#define f32(X) (any_t){._type = f32, .f32 = (X)}
-#define u32(X) (any_t){._type = u32, .u32 = (X)}
-#define u64(X) (any_t){._type = u64, .u64 = (X)}
-#define i32(X) (any_t){._type = i32, .i32 = (X)}
-#define i64(X) (any_t){._type = i64, .i64 = (X)}
+#define to_f64(X) (any_t){._type = f64, .data = (void*)(uintptr_t)(double)(X)}
+#define to_f32(X) (any_t){._type = f32, .data = (void*)(uintptr_t)(float)(X)}
+#define to_u32(X) (any_t){._type = u32, .data = (void*)(uintptr_t)(uint32_t)(X)}
+#define to_u64(X) (any_t){._type = u64, .data = (void*)(uintptr_t)(uint64_t)(X)}
+#define to_i32(X) (any_t){._type = i32, .data = (void*)(uintptr_t)(int32_t)(X)}
+#define to_i64(X) (any_t){._type = i64, .data = (void*)(uintptr_t)(int64_t)(X)}
 // -- //
 
 // macros for generic typechecks //
@@ -67,7 +58,6 @@ char* repr(ttype GType) {
 // -- //
 
 // println //
-#define println(X,...) pprintln((X),(any[]){__VA_ARGS__})
 #define DELIM "{:?}"
 char** split_string(const char* str, const char* delim) {
     if (!str || !delim || !*delim) return NULL;
@@ -96,7 +86,7 @@ char** split_string(const char* str, const char* delim) {
     for (size_t i = 0; i < num_tokens; i++) {
         end = strstr(start, delim);
 
-        size_t token_len = (end) ? (end - start) : strlen(start);
+        size_t token_len = (end) ? (size_t)(end - start) : strlen(start);
 
         // Allocate memory for the token (+1 for null terminator)
         result[i] = (char*)malloc(token_len + 1);
@@ -133,17 +123,59 @@ void free_split(char** arr) {
     free(arr);
 }
 
+#define println(X,...) pprintln((X),(any[]){__VA_ARGS__})
 void pprintln(const char* format, any items[]) {
-  char** u1 = split_string(format, DELIM);
-  char*  out_string = "";
-  int lenght_of_fmt = sizeof(items) / sizeof(items[0]);
-  for (size_t i = 0; u1[i] != NULL; i++) {
-    char *string_msg = u1[i];
-    ttype x;
-    if (i < lenght_of_fmt) {
-      x = items[i]._type;
+    if (!format) return;
+
+    char** parts = split_string(format, DELIM);
+    if (!parts) return;
+
+    // Count actual number of items passed (aura++)
+    size_t item_count = 0;
+    if (items) {
+        while (item_count < 32) {  // reasonable upper limit
+            if (items[item_count]._type == 0 && item_count > 0) break;
+            item_count++;
+        }
     }
-  }
+
+    size_t item_idx = 0;
+
+    for (size_t i = 0; parts[i] != NULL; i++) {
+        printf("%s", parts[i]);
+
+        // Replace {:?} with next item
+        if (item_idx < item_count && parts[i+1] != NULL) {  // only if there's more parts
+            any item = items[item_idx];
+
+            switch (item._type) {
+                case i32:
+                    printf("%d", *(int32_t*)&item.data);
+                    break;
+                case i64:
+                    printf("%ld", *(int64_t*)&item.data);
+                    break;
+                case u32:
+                    printf("%u", *(uint32_t*)&item.data);
+                    break;
+                case u64:
+                    printf("%lu", *(uint64_t*)&item.data);
+                    break;
+                case f32:
+                    printf("%f", *(float*)&item.data);
+                    break;
+                case f64:
+                    printf("%f", *(double*)&item.data);
+                    break;
+                default:
+                    printf("<unknown:%s>", repr(item._type));
+            }
+            item_idx++;
+        }
+    }
+
+    printf("\n");
+    free_split(parts);
 }
 // -- //
 
@@ -156,22 +188,31 @@ void pprintln(const char* format, any items[]) {
  */
 
 any add(ttype GType, any a, any b) {
-  //
-  typecheck(GType, a);
-  typecheck(GType, b);
+    typecheck(GType, a);
+    typecheck(GType, b);
 
-  return a;
-  //
+    any result = {._type = GType};
+
+    switch (GType) {
+        case f64:
+            {
+                double sum = *(double*)a.data + *(double*)b.data;
+                *(double*)&result.data = sum;          // Correct way
+            }
+            break;
+        // Add more types later...
+        default:
+            printf("add not implemented for type %s\n", repr(GType));
+            abort();
+    }
+    return result;
 }
 
 // end //////////
 int main(void);
 int main(void) {
-  // generics... HOW?
-
-  // x := add[f64](22/7, 10/3)
-  any x = add(f64, f64(22.0/7.0), f64(10.0/3.0));
-  println("answer is {:?}", x);
-  printf("hello sailor!");
-  return 34 + 35;
+    any x = add(f64, to_f64(35.1), to_f64(33.9));
+    println("answer is {:?}", x);
+    println("hello sailor! pi is approx {:?}", to_f64(22.0/7.0));
+    return 0;
 }
