@@ -207,6 +207,7 @@ int main(void) {
   any y = to_f64(35.0);
   any z = to_f64(34.0);
 
+  // x := add[f64](y, z)
   any x = add(f64, y, z);
 
   println("{:?} + {:?} = {:?}", y, z, x);
