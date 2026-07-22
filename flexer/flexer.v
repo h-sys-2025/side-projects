@@ -2,6 +2,8 @@ module main
 
 import os
 
+const CONST_DELIMS = "(){}[]<>,.?!:;=&|/\\@#$%^*'\" " // space also
+
 //@ tok struct, with diagnostics info too!
 struct Tokendiag {
   pub mut:
@@ -75,7 +77,8 @@ fn main() {
     } else {
       col_no += 1
     }
-    println("${line_no}:${col_no}: ${tok}")
+    // test: println("${line_no}:${col_no}: ${tok}")
+    if tok in CONST_DELIMS
   }
 
   return
@@ -85,7 +88,7 @@ fn main() {
 fn tokenize(line string) []string {
   mut raw_data := line
 
-  ttokens := "(){}[]<>,.?!:;=&|/\\@#$%^*'\" " // space also
+  ttokens := CONST_DELIMS
   for tok in ttokens.str().split("") {
     // test: println("seperator: ${tok.str()}")
     raw_data = raw_data.split(tok.str()).join("\n${tok.str()}\n")
