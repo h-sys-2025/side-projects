@@ -2,7 +2,7 @@ module main
 
 import os
 
-const CONST_DELIMS = "(){}[]<>,.?!:;=&|/\\@#$%^*'\" " // space also
+const const_delims = "(){}[]<>,.?!:;=&|/\\@#$%^*'\" " // space also
 
 //@ tok struct, with diagnostics info too!
 struct Tokendiag {
@@ -67,8 +67,11 @@ fn main() {
   // ---
   // task: now to classify every token into its struct! with line-no:col-no info!
 
+  mut parsed_program := []Tokendiag{}
+
   mut line_no := 0
   mut col_no  := 0
+  mut tok_kind := ""
   next_tok: for tok in ttokens {
     if tok == "\\n" {
       line_no += 1
@@ -78,8 +81,30 @@ fn main() {
       col_no += 1
     }
     // test: println("${line_no}:${col_no}: ${tok}")
-    if tok in CONST_DELIMS
+    if tok == " " {
+      // tok is space!
+      tok_kind = "SPACE"
+    } else if tok in const_delims.str().split("") {
+      // then tok is a special_char
+      tok_kind = "SPECIAL_CHAR"
+    } else if tok.contains("\"") {
+      // then tok is a string literal
+      tok_kind = "STRING_LITERAL"
+    } else {
+      tok_kind = "${tok.to_upper()}"
+    }
+
+    parsed_program << Tokendiag{
+      kind: tok_kind
+      content: tok
+      line: line_no
+      col: col_no
+    }
+
+    tok_kind = ""
   }
+
+  println(parsed_program)
 
   return
 }
@@ -88,7 +113,7 @@ fn main() {
 fn tokenize(line string) []string {
   mut raw_data := line
 
-  ttokens := CONST_DELIMS
+  ttokens := const_delims
   for tok in ttokens.str().split("") {
     // test: println("seperator: ${tok.str()}")
     raw_data = raw_data.split(tok.str()).join("\n${tok.str()}\n")

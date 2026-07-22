@@ -7,6 +7,13 @@
 import os
 ```
 
+## Constants:
+```v
+//PRIVATE
+
+const CONST_DELIMS = "(){}[]<>,.?!:;=&|/\\@#$%^*'\" " // space also
+```
+
 ## Functions:
 ```v
 //PRIVATE
