@@ -3,7 +3,7 @@ module main
 import os
 
 //@ tok struct, with diagnostics info too!
-struct tokendiag {
+struct Tokendiag {
   pub mut:
     kind string
     content string
@@ -65,7 +65,18 @@ fn main() {
   // ---
   // task: now to classify every token into its struct! with line-no:col-no info!
 
-
+  mut line_no := 0
+  mut col_no  := 0
+  next_tok: for tok in ttokens {
+    if tok == "\\n" {
+      line_no += 1
+      col_no =  0 // new line's first col
+      continue next_tok
+    } else {
+      col_no += 1
+    }
+    println("${line_no}:${col_no}: ${tok}")
+  }
 
   return
 }
@@ -95,21 +106,21 @@ fn tokenize(line string) []string {
     if x == "\"" {
       str_started = !str_started
       continue next_tok
-    } else {
-      tokens << "${x}"
     }
 
     if str_started {
       str_make_temp = "${str_make_temp}${x}"
-      continue next_tok
     } else {
       if str_make_temp != "" {
         tokens << "\"${str_make_temp}\""
         str_make_temp = ""
-        continue next_tok
       }
-      continue next_tok
     }
+
+    if !str_started {
+      tokens << "${x}"
+    }
+
   }
 
   return tokens
