@@ -226,7 +226,7 @@ fn autodoc_and_commit(dir_path string, commit_all bool) []string {
     }
     if deleted_items.len > 0 {
       println("[info] processing deleted files!")
-      command := "git add . && git commit -m 'mingle-v2: deleted: ${deleted_items.join(" AND ")}'".split(" ")
+      command := "git commit -m 'mingle-v2: deleted: ${deleted_items.join(" AND ")}'".split(" ")
       cmd     := os.exec(command)
       if cmd.exit_code != 0 {
           println(" !!! failed: ${cmd.output}")
