@@ -161,7 +161,7 @@ fn find_and_autodoc_v_files(side_proj string) {
 //@ get the dirs which we need to commit!
 fn autodoc_and_commit(dir_path string, commit_all bool) []string {
     autodoc_bin_path := os.join_path(dir_path, ".","autodoc","autodoc")
-
+    mut deleted_items := []string{}
     mut dirs := []string{}
 
     if commit_all != true {
@@ -191,7 +191,9 @@ fn autodoc_and_commit(dir_path string, commit_all bool) []string {
                             println(" -+- generated docs!")
                         }
                     }
-                    add_all_and_commit("mingle-v2: ${time.now()}",file_path_x)
+                    add_all_and_commit("mingle-v2: ${time.now()}", file_path_x)
+                } else if u4 == "deleted:" {
+                    deleted_items << lline[u3+3]
                 }
             }
         }
@@ -221,6 +223,16 @@ fn autodoc_and_commit(dir_path string, commit_all bool) []string {
             }
             add_all_and_commit("mingle-v2: ${time.now()}",file_path_x)
         }
+    }
+    if deleted_items.len > 0 {
+      println("[info] processing deleted files!")
+      command := "git add . && git commit -m 'mingle-v2: deleted: ${deleted_items.join(" AND ")}'".split(" ")
+      cmd     := os.exec(command)
+      if cmd.exit_code != 0 {
+          println(" !!! failed: ${cmd.output}")
+      } else {
+          println(" -+- deleted and comiited!")
+      }
     }
     return dirs
 }
