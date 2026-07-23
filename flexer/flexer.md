@@ -29,7 +29,7 @@ fn (mut p Parser) expect(thing string) (bool, Tokendiag) {
 ```v
 //PUBLIC
 
-fn (mut p Parser) next(thing string) (bool, Tokendiag) {
+fn (mut p Parser) next() Tokendiag {
 ```
 ```v
 //PRIVATE
