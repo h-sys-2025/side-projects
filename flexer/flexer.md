@@ -11,7 +11,7 @@ import os
 ```v
 //PRIVATE
 
-const CONST_DELIMS = "(){}[]<>,.?!:;=&|/\\@#$%^*'\" " // space also
+const const_delims = "(){}[]<>,.?!:;=&|/\\@#$%^*'\" " // space also
 ```
 
 ## Functions:

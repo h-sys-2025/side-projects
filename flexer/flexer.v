@@ -67,7 +67,7 @@ fn main() {
   // ---
   // task: now to classify every token into its struct! with line-no:col-no info!
 
-  mut parsed_program := []Tokendiag{}
+  mut lexed_program := []Tokendiag{}
 
   mut line_no := 0
   mut col_no  := 0
@@ -94,7 +94,7 @@ fn main() {
       tok_kind = "${tok.to_upper()}"
     }
 
-    parsed_program << Tokendiag{
+    lexed_program << Tokendiag{
       kind: tok_kind
       content: tok
       line: line_no
@@ -104,7 +104,36 @@ fn main() {
     tok_kind = ""
   }
 
-  println(parsed_program)
+  // test: println(parsed_program)
+
+  // conclusion: ok, now they are classifies!
+  // ---
+  // task:
+
+  mut parsed_program := []Tokendiag{}
+  mut statement := ""
+  for i in 0..parsed_program.len {
+    thing   := parsed_program[i]
+
+    line_no := thing.line
+    col_no  := thing.col
+
+    if thing == "fn" {
+      // this it is tok_fn
+      tok_fn := thing
+      // thing+1 is name.
+      name   := expect("ident")
+      // thing+2 is (
+      // thing+x must be args
+      // thing+x+1 is )
+      // thing+x+2 is ret_type
+      // thing+x+3 is {
+      // thing+x+3+y must be body!
+      // thing+x+3+y+1 is }
+
+      // now THAT we call a function
+    }
+  }
 
   return
 }
@@ -148,7 +177,6 @@ fn tokenize(line string) []string {
     if !str_started {
       tokens << "${x}"
     }
-
   }
 
   return tokens
