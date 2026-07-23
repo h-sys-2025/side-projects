@@ -110,7 +110,7 @@ fn main() {
   // ---
   // task:
 
-  mut parsed_program := Parser{lexed: lexed_program}
+  mut parsed_program := Parser{items: lexed_program}
   mut statement := ""
   for i in 0.. parsed_program.items.len {
     thing   := parsed_program.items[i]
@@ -118,7 +118,7 @@ fn main() {
     line_no = thing.line
     col_no  = thing.col
 
-    if thing == "fn" {
+    if thing.kind == "fn" {
       // this it is tok_fn
       tok_fn := thing
       // thing+1 is name.
@@ -126,7 +126,7 @@ fn main() {
       // thing+2 is (
       parsed_program.expect("(")
       // thing+x must be args
-      // TBD:
+      args_block := parsed_program.parse_block("()")
       // thing+x+1 is )
       parsed_program.expect("(")
       // thing+x+2 is ret_type
@@ -134,7 +134,7 @@ fn main() {
       // thing+x+3 is {
       parsed_program.expect("{")
       // thing+x+3+y must be body!
-      // TBD:
+      code_block := parsed_program.parse_block("{}")
       // thing+x+3+y+1 is }
       parsed_program.expect("}")
 
@@ -150,11 +150,11 @@ struct Parser {
     line int
     col int
     curr_pointer int
-    items []Tokendiag{}
+    items []Tokendiag
 }
 
 pub fn (mut p Parser) expect(thing string) (bool, Tokendiag) {
-  la_item := p.items[curr_pointer]
+  la_item := p.items[p.curr_pointer]
   if la_item.str() == thing {
     p.curr_pointer += 1
     return true, la_item
@@ -164,8 +164,8 @@ pub fn (mut p Parser) expect(thing string) (bool, Tokendiag) {
   }
 }
 
-pub fn (mut p Parser) next(thing string) (bool, Tokendiag) {
-  la_item := p.items[curr_pointer]
+pub fn (mut p Parser) next() Tokendiag {
+  la_item := p.items[p.curr_pointer]
   p.curr_pointer += 1
   return la_item
 }

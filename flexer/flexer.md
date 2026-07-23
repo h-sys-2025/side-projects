@@ -22,6 +22,16 @@ const const_delims = "(){}[]<>,.?!:;=&|/\\@#$%^*'\" " // space also
 fn main() {
 ```
 ```v
+//PUBLIC
+
+fn (mut p Parser) expect(thing string) (bool, Tokendiag) {
+```
+```v
+//PUBLIC
+
+fn (mut p Parser) next(thing string) (bool, Tokendiag) {
+```
+```v
 //PRIVATE
 
 // this function tokenizes every token, identifier, int literal, float literal, boolean, keyword, and these ( ) { } [ ] < > , . ? !
@@ -34,4 +44,9 @@ fn tokenize(line string) []string {
 
 // tok struct, with diagnostics info too!
 struct Tokendiag {
+```
+```v
+//PRIVATE
+
+struct Parser {
 ```
