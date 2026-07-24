@@ -90,7 +90,7 @@ defmodule Main do
               # autodoc the .v files.
               command = "#{autodoc_file_path} #{entry}"
               # debug: IO.puts(command)
-              {output, exit_code} = System.cmd("sh",["-c","command"])
+              {output, exit_code} = System.cmd("sh",["-c",command])
               case exit_code do
                 0 ->
                   # add them to entries list.
