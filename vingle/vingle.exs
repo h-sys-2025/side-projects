@@ -73,9 +73,9 @@ defmodule Main do
       extension = String.split(entry)
         |> Enum.at(-1)
 
+      IO.puts(extension)
       v_file = case extension do
         ".v" ->
-          IO.puts("got a v file")
           # autodoc the .v files.
           command = "#{autodoc_file_path} #{entry}"
           {output, exit_code} = System.cmd("sh",["-c","command"])
