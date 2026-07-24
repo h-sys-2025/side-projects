@@ -70,8 +70,8 @@ defmodule Main do
     autodoc_file_path = "#{target}/autodoc/autodoc"
 
     entries = Enum.reduce(entries, entries, fn entry, acc ->
-      extension = String.split(entry)
-        |> Enum.at(0)
+      extension = String.split(entry,".")
+        |> Enum.at(-1)
 
       IO.puts(extension)
       v_file = case extension do
