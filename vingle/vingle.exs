@@ -68,7 +68,7 @@ defmodule Main do
 
     IO.puts("preparing .v files for autodoc!")
     autodoc_file_path = "/home/dzebra/Work/probe/Programming/hsys25/side-projects/autodoc/autodoc"
-
+    cwd = File.cwd!()
     entries = Enum.reduce(entries, entries, fn entry, acc ->
       u1 = String.split(entry,".")
       case u1 > 0 do
@@ -76,6 +76,7 @@ defmodule Main do
           extension = u1
             |> Enum.at(-1)
 
+          entry = "#{cwd}/#{entry}"
           v_file = case extension do
             "v" ->
               IO.puts(" -- autodoc: #{entry}")
