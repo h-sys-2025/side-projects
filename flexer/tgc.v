@@ -97,7 +97,7 @@ fn main() {
 
           // TBD: convert to C
 
-          out_ln := "Any_t ${name}${args_data.replace("T","Any_t")} ${func_def.join("")}"
+          out_ln := "double ${name}${args_data.replace("T","double")} ${func_def.join("")}"
           // debug: println(out_ln)
           generated_code << out_ln
         }
