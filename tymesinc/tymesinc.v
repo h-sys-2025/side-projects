@@ -106,4 +106,9 @@ fn (mut key_vault KV) genesis() {
   new_uuid := rand.uuid_v4()
   key_vault.keys[new_uuid] = u64(time.now().unix() + (60 * 60))
   println("genesis-uuid: ${new_uuid}")
+  testing_vingle()
+}
+
+fn testing_vingle() {
+  println("ignore me")
 }
