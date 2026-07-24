@@ -81,6 +81,7 @@ defmodule Main do
               IO.puts(" -- autodoc: #{entry}")
               # autodoc the .v files.
               command = "#{autodoc_file_path} #{entry}"
+              IO.puts(command)
               {output, exit_code} = System.cmd("sh",["-c","command"])
               case exit_code do
                 0 ->
