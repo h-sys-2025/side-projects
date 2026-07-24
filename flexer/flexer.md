@@ -37,16 +37,6 @@ fn (mut p Parser) next() Tokendiag {
 // this function tokenizes every token, identifier, int literal, float literal, boolean, keyword, and these ( ) { } [ ] < > , . ? !
 fn tokenize(line string) []string {
 ```
-```v
-//PRIVATE
-
-fn whatever() {
-```
-```v
-//PRIVATE
-
-fn ignore_me() {
-```
 
 ## Structs:
 ```v
