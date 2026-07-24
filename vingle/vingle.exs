@@ -70,23 +70,29 @@ defmodule Main do
     autodoc_file_path = "#{target}/autodoc/autodoc"
 
     entries = Enum.reduce(entries, entries, fn entry, acc ->
-      extension = String.split(entry,".")
-        |> Enum.at(-1)
+      u1 = String.split(entry,".")
+      case u1 > 0 do
+        true ->
+          extension = u1
+            |> Enum.at(-1)
 
-      v_file = case extension do
-        "v" ->
-          IO.puts(" -- autodoc: #{entry}")
-          # autodoc the .v files.
-          command = "#{autodoc_file_path} #{entry}"
-          {output, exit_code} = System.cmd("sh",["-c","command"])
-          case exit_code do
-            0 ->
-              # add them to entries list.
-              md_file_path = "#{Path.rootname(entry)}.md"
-              IO.puts(" -- done: #{md_file_path}")
-              acc ++ [md_file_path]
+          v_file = case extension do
+            "v" ->
+              IO.puts(" -- autodoc: #{entry}")
+              # autodoc the .v files.
+              command = "#{autodoc_file_path} #{entry}"
+              {output, exit_code} = System.cmd("sh",["-c","command"])
+              case exit_code do
+                0 ->
+                  # add them to entries list.
+                  md_file_path = "#{Path.rootname(entry)}.md"
+                  IO.puts(" -- done: #{md_file_path}")
+                  acc ++ [md_file_path]
+                _ ->
+                  IO.puts(" -- possible failure:\n\t#{output}")
+                  acc
+              end
             _ ->
-              IO.puts(" -- possible failure:\n\t#{output}")
               acc
           end
         _ ->
