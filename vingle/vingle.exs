@@ -150,7 +150,7 @@ defmodule Main do
 
     Enum.reduce(entries, [], fn file_name, acc ->
       # Construct full path
-      full_path = String.trim("#{target}/#{String.trim(file_name)}")
+      full_path = String.trim("#{target}/./#{String.trim(file_name)}")
 
       cond do
         String.starts_with?(file_name, ".") or String.ends_with?(file_name, ".backup") ->
