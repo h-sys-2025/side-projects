@@ -102,25 +102,31 @@ defmodule Main do
 
     IO.puts("preparing changes for commit!")
     Enum.each(entries, fn entry ->
-      {output, exit_code} = System.cmd("sh", ["-c", "git add #{entry}"])
-      case exit_code do
-        0 ->
-          # IO.puts(" -- Done!")
-          :ok
+      case File.exists?(entry) do
+        true ->
+          {output, exit_code} = System.cmd("sh", ["-c", "git add #{entry}"])
+          case exit_code do
+            0 ->
+              # IO.puts(" -- Done!")
+              :ok
+            _ ->
+              # IO.puts(" -- exit_code: #{exit_code}")
+              :err
+          end
+          {output, exit_code} = System.cmd("sh", ["-c", "git commit -m 'vingle: autocommit: #{DateTime.utc_now()}'"])
+          case exit_code do
+            0 ->
+              # IO.puts(" -- Done!")
+              :ok
+            _ ->
+              # IO.puts(" -- exit_code: #{exit_code}")
+              :err
+          end
+          IO.puts("adds & commits: #{entry}")
+
         _ ->
-          # IO.puts(" -- exit_code: #{exit_code}")
           :err
       end
-      {output, exit_code} = System.cmd("sh", ["-c", "git commit -m 'vingle: autocommit: #{DateTime.utc_now()}'"])
-      case exit_code do
-        0 ->
-          # IO.puts(" -- Done!")
-          :ok
-        _ ->
-          # IO.puts(" -- exit_code: #{exit_code}")
-          :err
-      end
-      IO.puts("adds & commits: #{entry}")
     end)
 
     IO.puts("preparing commits for push!")
