@@ -71,7 +71,7 @@ defmodule Main do
 
     entries = Enum.reduce(entries, entries, fn entry, acc ->
       extension = String.split(entry)
-        |> Enum.at(-1)
+        |> Enum.at(-2)
 
       IO.puts(extension)
       v_file = case extension do
