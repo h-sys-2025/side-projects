@@ -29,7 +29,7 @@ pub fn (mut llist List[T]) zero() {
     llist.len = 0
 }
 
-pub fn (mut llist List[T]) convert_map[U](func fn(T) U) List[U] {
+pub fn (mut llist List[T]) map[U](func fn(T) U) List[U] {
     mut list_u := List[U]{}
     burner := $zero(U)
     for x in 0..llist.items.len {
@@ -74,7 +74,7 @@ fn main() {
     })
 
     // now lets try to convert!
-    mut nnames := names.convert_map[[]string](fn(x string) []string {
+    mut nnames := names.map[[]string](fn(x string) []string {
         return x.split("")
     })
 
