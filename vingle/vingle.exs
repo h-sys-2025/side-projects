@@ -81,8 +81,9 @@ defmodule Main do
           case exit_code do
             0 ->
               # add them to entries list.
-
-              acc ++ ["#{Path.rootname(entry)}.md"]
+              md_file_path = "#{Path.rootname(entry)}.md"
+              IO.puts(" -- done: #{md_file_path}")
+              acc ++ [md_file_path]
             _ ->
               IO.puts(" -- possible failure:\n\t#{output}")
               acc
