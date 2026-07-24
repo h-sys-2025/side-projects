@@ -2,7 +2,9 @@ module main
 
 import os
 
-const const_delims = "(){}[]<>,.?!:;=&|/\\@#$%^*'\" " // space also
+//@ testing vingle again
+const something = "(){}[]<>,.?!:;=&|/\\@#$%^*'\" " // space also
+const const_delims = something
 
 //@ tok struct, with diagnostics info too!
 struct Tokendiag {
