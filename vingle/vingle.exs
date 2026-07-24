@@ -51,7 +51,8 @@ defmodule Main do
           # IO.puts(" -- Done!")
           :ok
         _ ->
-          IO.puts(" -- exit_code: #{exit_code}")
+          # IO.puts(" -- exit_code: #{exit_code}")
+          :err
       end
       {output, exit_code} = System.cmd("sh", ["-c", "git commit -m 'vingle: autocommit: #{DateTime.utc_now()}'"])
       case exit_code do
@@ -59,7 +60,8 @@ defmodule Main do
           # IO.puts(" -- Done!")
           :ok
         _ ->
-          IO.puts(" -- exit_code: #{exit_code}")
+          # IO.puts(" -- exit_code: #{exit_code}")
+          :err
       end
       IO.puts("adds & commits: #{entry}")
     end)
