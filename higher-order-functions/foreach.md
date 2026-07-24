@@ -31,7 +31,12 @@ fn (mut llist List[T]) zero() {
 ```v
 //PUBLIC
 
-fn (mut llist List[T]) convert_map[U](func fn(T) U) List[U] {
+fn (mut llist List[T]) map[U](func fn(T) U) List[U] {
+```
+```v
+//PUBLIC
+
+fn (mut llist List[T]) filter(func fn(T, List[T]) bool) {
 ```
 ```v
 //PUBLIC
@@ -41,6 +46,7 @@ fn (mut llist List[T]) foreach(func fn(T) ?T) {
 ```v
 //PRIVATE
 
+// main function (testing mingle again, ignore this!!)
 fn main() {
 ```
 
