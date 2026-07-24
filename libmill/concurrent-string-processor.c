@@ -7,27 +7,15 @@ coroutine void worker(chan input, chan output) {
     while (1) {
         char *work = chr(input, char*);  // Receive work
         if (work == NULL) break;         // NULL signals shutdown
-        FILE *fp;
-        char buffer[256];
-
-        fp = popen("whoami", "r");
-        if (fp == NULL) {
-            perror("popen failed");
-            return;
-        }
-
-        if (fgets(buffer, sizeof(buffer), fp) != NULL) {
-            printf("Processed-string:\n\t%s", buffer);
-        }
-
-        pclose(fp);
+        system(work);
+        msleep(now() + 1);
         int len = strlen(work);
         chs(output, int, len);           // Send result
     }
 }
 
 int main() {
-    const char *tasks[] = {"hello", "libmill", "concurrency", "C", "coroutine"};
+    const char *tasks[] = {"ls -la","whoami","lolcat /etc/passwd"};
     int num_tasks = sizeof(tasks) / sizeof(tasks[0]);
     int num_workers = 3;
 
