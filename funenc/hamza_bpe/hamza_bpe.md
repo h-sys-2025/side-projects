@@ -2,13 +2,14 @@
 # Module:
 - hamza_bpe
 
-## Dependencies:
-```v
-```
-
 ## Functions:
 ```v
+//PRIVATE
+
 fn split_2(text string) []string {
 ```
+```v
+//PUBLIC
 
-## Structs:
+fn please_encode_this(message string) (string, map[string]string) {
+```
