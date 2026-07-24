@@ -34,15 +34,14 @@ defmodule Main do
           {false, [target]}
       end
 
-    {commands} =
-      case is_dir do
-        true ->
-          {["git add #{Enum.join(entries, " ")}"]}
-        _ ->
-          {["git add #{Enum.at(entries,  0)}"]}
-      end
-
-    commands = Enum.join(commands, " && ")
+    # {commands} =
+    #   case is_dir do
+    #     true ->
+    #       {["git add #{Enum.join(entries, " ")}"]}
+    #     _ ->
+    #       {["git add #{Enum.at(entries,  0)}"]}
+    #   end
+    # commands = Enum.join(commands, " && ")
 
     IO.puts("preparing changes for commit!")
     Enum.each(entries, fn entry ->
