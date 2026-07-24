@@ -22,17 +22,23 @@ defmodule Main do
           System.halt(1)
       end
 
-    if String.trim(target) == "" do
-      usage()
-    end
+    case {String.trim(target) == "", File.exists?(target), File.dir?(target)} do
+      {false,true,true} ->
+        nil
 
-    {is_dir, entries} =
-      case File.dir?(target) do
-        true ->
-          {true, contents(target)}
-        _ ->
-          {false, [target]}
-      end
+      {false,false,_} ->
+        IO.puts("#{target} does not exist, exiting...")
+        System.halt(1)
+
+      {false,true,false} ->
+        IO.puts("#{target} is not a dir, expected a dir, exiting...")
+        System.halt(1)
+
+
+      {_,_} ->
+        usage()
+        System.halt(1)
+    end
 
     found = Enum.find(File.ls!(target), fn x -> x == ".git" end)
     case found do
@@ -42,6 +48,15 @@ defmodule Main do
         IO.puts("warn: no .git repo found in #{target}, exiting...")
         System.halt(1)
     end
+
+
+    {is_dir, entries} =
+      case File.dir?(target) do
+        true ->
+          {true, contents(target)}
+        _ ->
+          {false, [target]}
+      end
 
     # {commands} =
     #   case is_dir do
