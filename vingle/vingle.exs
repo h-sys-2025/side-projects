@@ -34,6 +34,15 @@ defmodule Main do
           {false, [target]}
       end
 
+    found = Enum.find(File.ls!(target), fn x -> x == ".git" end)
+    case found do
+      ".git" ->
+        nil
+      _ ->
+        IO.puts("warn: no .git repo found in #{target}, exiting...")
+        System.halt(1)
+    end
+
     # {commands} =
     #   case is_dir do
     #     true ->
@@ -42,6 +51,14 @@ defmodule Main do
     #       {["git add #{Enum.at(entries,  0)}"]}
     #   end
     # commands = Enum.join(commands, " && ")
+
+    IO.puts("preparing .v files for autodoc!")
+    autodoc_file_path = "#{target}/autodoc/autodoc"
+    Enum.each(entries, fn entry ->
+      # autodoc the .v files.
+
+      # add them to entries list.
+    end)
 
     IO.puts("preparing changes for commit!")
     Enum.each(entries, fn entry ->
