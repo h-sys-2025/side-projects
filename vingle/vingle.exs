@@ -74,7 +74,7 @@ defmodule Main do
         |> Enum.at(-1)
 
       v_file = case extension do
-        ".v" ->
+        "v" ->
           IO.puts(" -- autodoc: #{entry}")
           # autodoc the .v files.
           command = "#{autodoc_file_path} #{entry}"
