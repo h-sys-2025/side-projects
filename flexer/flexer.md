@@ -11,11 +11,7 @@ import os
 ```v
 //PRIVATE
 
-// testing vingle again
-const something = "(){}[]<>,.?!:;=&|/\\@#$%^*'\" " // space also
-//PRIVATE
-
-const const_delims = something
+const const_delims = "(){}[]<>,.?!:;=&|/\\@#$%^*'\" " // space also
 ```
 
 ## Functions:
