@@ -213,3 +213,12 @@ fn tokenize(line string) []string {
 
   return tokens
 }
+
+fn whatever() {
+  return
+}
+
+fn ignore_me() {
+  whatever()
+  return
+}
