@@ -75,6 +75,7 @@ defmodule Main do
 
       v_file = case extension do
         ".v" ->
+          IO.puts("got a v file")
           # autodoc the .v files.
           command = "#{autodoc_file_path} #{entry}"
           {output, exit_code} = System.cmd("sh",["-c","command"])
