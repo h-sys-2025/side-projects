@@ -86,7 +86,7 @@ defmodule Main do
                 0 ->
                   # add them to entries list.
                   md_file_path = "#{Path.rootname(entry)}.md"
-                  IO.puts(" -- done: #{md_file_path}\n\t#{output}")
+                  IO.puts(" -- done: #{md_file_path}")
                   acc ++ [md_file_path]
                 _ ->
                   IO.puts(" -- possible failure:\n\t#{output}")
