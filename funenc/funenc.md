@@ -10,7 +10,7 @@ import hamza_bfe { encrypt_this_please }
 
 ## Functions:
 ```v
+//PRIVATE
+
 fn main() {
 ```
-
-## Structs:
