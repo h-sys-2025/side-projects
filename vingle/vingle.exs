@@ -68,6 +68,13 @@ defmodule Main do
 
     IO.puts("preparing .v files for autodoc!")
     autodoc_file_path = "/home/dzebra/Work/probe/Programming/hsys25/side-projects/autodoc/autodoc"
+    case File.exists?(autodoc_file_path) do
+      true ->
+        nil
+      _ ->
+        IO.puts("autodoc file does not exist or is not accessable.")
+        System.halt(1)
+    end
     cwd = File.cwd!()
     entries = Enum.reduce(entries, entries, fn entry, acc ->
       u1 = String.split(entry,".")
