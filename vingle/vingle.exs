@@ -11,7 +11,7 @@ defmodule Main do
     IO.puts("#{vingle()} (#{version()})")
 
     argv = System.argv()
-    {target, verbose} =
+    {target, _} =
       case argv do
         [t] ->
           {t, false}
@@ -67,7 +67,7 @@ defmodule Main do
     # commands = Enum.join(commands, " && ")
 
     IO.puts("preparing .v files for autodoc!")
-    autodoc_file_path = "#{target}/autodoc/autodoc"
+    autodoc_file_path = "/home/dzebra/Work/probe/Programming/hsys25/side-projects/autodoc/autodoc"
 
     entries = Enum.reduce(entries, entries, fn entry, acc ->
       u1 = String.split(entry,".")
