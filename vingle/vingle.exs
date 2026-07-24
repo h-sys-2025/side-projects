@@ -34,8 +34,7 @@ defmodule Main do
         IO.puts("#{target} is not a dir, expected a dir, exiting...")
         System.halt(1)
 
-
-      {_,_} ->
+      {_,_,_} ->
         usage()
         System.halt(1)
     end
@@ -69,10 +68,28 @@ defmodule Main do
 
     IO.puts("preparing .v files for autodoc!")
     autodoc_file_path = "#{target}/autodoc/autodoc"
-    Enum.each(entries, fn entry ->
-      # autodoc the .v files.
 
-      # add them to entries list.
+    entries = Enum.reduce(entries, entries, fn entry, acc ->
+      extension = String.split(entry)
+        |> Enum.at(-1)
+
+      v_file = case extension do
+        ".v" ->
+          # autodoc the .v files.
+          command = "#{autodoc_file_path} #{entry}"
+          {output, exit_code} = System.cmd("sh",["-c","command"])
+          case exit_code do
+            0 ->
+              # add them to entries list.
+
+              acc ++ ["#{Path.rootname(entry)}.md"]
+            _ ->
+              IO.puts(" -- possible failure:\n\t#{output}")
+              acc
+          end
+        _ ->
+          acc
+      end
     end)
 
     IO.puts("preparing changes for commit!")
