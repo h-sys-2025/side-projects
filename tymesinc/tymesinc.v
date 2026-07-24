@@ -57,10 +57,10 @@ fn handle_connection(mut conn net.TcpConn, mut key_vault KV) {
     if auth == true {
       // Send response
       fmt_cmd := command.join(" ").replace("\n","")
-      res := os.execute("sh -c '${fmt_cmd}'")
+      res := os.execute("${fmt_cmd}")
       response = "${res.output}\n---\n${res.exit_code}\n"
     } else {
-      responce = "${time.now()} (500)"
+      response = "${time.now()} (500)"
     }
   } else if cmd[0] == "dead" && cmd.len > 0 {
     password  := cmd[1]
@@ -68,7 +68,7 @@ fn handle_connection(mut conn net.TcpConn, mut key_vault KV) {
     if auth == true {
       response = "ok cowboy: ${key}\n"
     } else {
-      responce = "${time.now()} (500)"
+      response = "${time.now()} (500)"
     }
   } else {
     // Send response
