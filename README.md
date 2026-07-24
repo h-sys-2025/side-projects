@@ -7,10 +7,10 @@
 > I HATE VIBECODING.
 > #stop-vibecoding
 
-## `2. Only use V-language`
-> *(because `v` is goat!)*
-> *`C`* is also allowed!
-> `Elixir` is also okay!
+## `2. Only use top-tier languages`
+- `V`: *because `v` is goat!*
+- *`C`*: is also allowed!
+- `Elixir`: is also okay!
 
 ### This repo has its own custom project manger *`mingle`*.
 - It also generates docmentations (using *`autodoc`*).
