@@ -4,7 +4,7 @@
 
 defmodule Main do
   @vingle  "vingle"
-  @version "v0.1-dev"
+  @version "v1.0-operational"
 
   def main do
     # Access module attributes directly in the string interpolation
@@ -75,6 +75,7 @@ defmodule Main do
         IO.puts("autodoc file does not exist or is not accessable.")
         System.halt(1)
     end
+
     cwd = File.cwd!()
     entries = Enum.reduce(entries, entries, fn entry, acc ->
       u1 = String.split(entry,".")
