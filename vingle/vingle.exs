@@ -76,7 +76,7 @@ defmodule Main do
           extension = u1
             |> Enum.at(-1)
 
-          entry = "#{cwd}/#{entry}"
+          entry = Path.join(cwd,entry)
           v_file = case extension do
             "v" ->
               IO.puts(" -- autodoc: #{entry}")
