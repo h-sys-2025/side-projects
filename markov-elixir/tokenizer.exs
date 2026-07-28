@@ -49,7 +49,7 @@ end
 defmodule Main do
   def main() do
     data_file = "./training_corpus.data"
-
+    output_tokens_file = "./tokens.tokens"
     {data} =
       case File.read(data_file) do
         {:ok, content} ->
@@ -62,6 +62,14 @@ defmodule Main do
 
     tokens = Tokenizer.tokenize(data)
     IO.puts("tokens: #{tokens}")
+
+    case File.write(output_tokens_file, tokens) do
+      :ok ->
+        nil
+      _ ->
+        IO.puts("writing to file #{output_tokens_file} failed!")
+        System.halt()
+    end
   end
 end
 
