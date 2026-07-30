@@ -3,9 +3,11 @@
 #include <string.h>
 #include <libmill.h>
 
+#define string char*
+
 coroutine void worker(chan input, chan output) {
     while (1) {
-        char *work = chr(input, char*);  // Receive work
+        string work = chr(input, string);  // Receive work
         if (work == NULL) break;         // NULL signals shutdown
         system(work);
         msleep(now() + 1);
@@ -15,7 +17,7 @@ coroutine void worker(chan input, chan output) {
 }
 
 int main() {
-    const char *tasks[] = {"ls -la","whoami","lolcat /etc/passwd"};
+    string tasks[] = {"ls -la","whoami","lolcat /etc/passwd"};
     int num_tasks = sizeof(tasks) / sizeof(tasks[0]);
     int num_workers = 3;
 
@@ -29,7 +31,7 @@ int main() {
 
     // Send tasks
     for (int i = 0; i < num_tasks; i++) {
-        chs(input, char*, (char*)tasks[i]);
+        chs(input, string, (string)tasks[i]);
     }
 
     // Collect results
@@ -40,7 +42,7 @@ int main() {
 
     // Stop all workers
     for (int i = 0; i < num_workers; i++) {
-        chs(input, char*, NULL);
+        chs(input, string, NULL);
     }
 
     // close channel!
