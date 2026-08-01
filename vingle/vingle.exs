@@ -39,6 +39,9 @@ defmodule Main do
         System.halt(1)
     end
 
+    # add all changes first, because somewhy it is not doing it!
+    {output, exit_code} = System.cmd("sh",["-c","\"cd #{target} && git add .\""])
+
     found = Enum.find(File.ls!(target), fn x -> x == ".git" end)
     case found do
       ".git" ->
