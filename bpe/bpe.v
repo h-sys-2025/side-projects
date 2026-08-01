@@ -35,33 +35,39 @@ fn main() {
 
     mut translation_table := map[string]string
 
-    // first, we need to divide text into: [][2]char - list of 2 characters.
-    bytes := split_2(text)
+    for {
+      if !(unused_placeholder_i < unused_placeholder_bytes.len) {
+        break
+      }
+      // first, we need to divide text into: [][2]char - list of 2 characters.
+      bytes := split_2(text)
 
-    // now rank all byte pairs
-    for x in bytes {
-        byte_ranking[x] += 1
+      // now rank all byte pairs
+      for x in bytes {
+          byte_ranking[x] += 1
+      }
+
+      // test: verbose: println(byte_ranking)
+
+      // then we need unused place-holder bytes, how? lets use chinese or arabic ones? no, Lets use roman? I need atleast 50, let me check:
+      // we got unused_placeholder_bytes from web, easy!
+
+      for byte_pair, _ in byte_ranking {
+          if unused_placeholder_i < unused_placeholder_bytes.len {
+              bplaceholder := unused_placeholder_bytes[unused_placeholder_i]
+              unused_placeholder_i += 1
+              // test: verbose: println("replacing: ${byte_pair} -> ${rune(bplaceholder)}")
+              text = text.replace(byte_pair, rune(bplaceholder).str())
+              translation_table[byte_pair] = rune(bplaceholder).str()
+          } else {
+              break
+          }
+      }
     }
 
-    // test: verbose: println(byte_ranking)
-
-    // then we need unused place-holder bytes, how? lets use chinese or arabic ones? no, Lets use roman? I need atleast 50, let me check:
-    // we got unused_placeholder_bytes from web, easy!
-
-    for byte_pair, _ in byte_ranking {
-        if unused_placeholder_i < unused_placeholder_bytes.len {
-            bplaceholder := unused_placeholder_bytes[unused_placeholder_i]
-            unused_placeholder_i += 1
-            // test: verbose: println("replacing: ${byte_pair} -> ${rune(bplaceholder)}")
-            text = text.replace(byte_pair, rune(bplaceholder).str())
-            translation_table[byte_pair] = rune(bplaceholder).str()
-        } else {
-            break
-        }
-    }
-    if unused_placeholder_i < unused_placeholder_bytes.len {
+    /*if unused_placeholder_i < unused_placeholder_bytes.len {
         println("i have more placeholders!")
-    }
+    }*/
     // println(translation_table)
     // println(text)
 
@@ -94,7 +100,7 @@ fn main() {
         ttext = ttext.replace(y, x)
     }
     println(" --> this is decoded thing: ${ttext}\n\n")
-    if whatever.split(" ").len == ttext.split(" ").len && whatever == ttext {
+    if whatever == ttext {
         println("initial and decoded texts match, success!")
     } else {
         println("initial and decoded texts DO NOT MATCH, failure!!!!!!!")
