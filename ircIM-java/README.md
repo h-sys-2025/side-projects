@@ -1,6 +1,20 @@
 ## small immitation of irc servers.
 - its my first tiem using java, will never use ever again.
 
+### Update 1:
+- Now people get joining notifications too.
+```sh
+(myenv) debb% telnet 127.0.0.1 21553
+Trying 127.0.0.1...
+Connected to 127.0.0.1.
+Escape character is '^]'.
+Welcome to the IRC Server! You are in channel: #welcome
+!join #hamz
+ ircIM: OK: joined channel `#hamz`.
+[#welcome] /127.0.0.1:50024:  user `/127.0.0.1:50024` has joined this channel.
+[#welcome] /127.0.0.1:50040:  user `/127.0.0.1:50040` has joined this channel.
+```
+
 #### server:
 ```sh
 _*_ Running: `javac /home/dzebra/Work/probe/Programming/hsys25/side-projects/ircIM-java/irc_im_serv.java 2>&1 && java -cp "$(dirname "/home/dzebra/Work/probe/Programming/hsys25/side-projects/ircIM-java/irc_im_serv.java")" "$(basename "/home/dzebra/Work/probe/Programming/hsys25/side-projects/ircIM-java/irc_im_serv.java" .java)"; true` _*_
