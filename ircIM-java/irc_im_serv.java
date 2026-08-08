@@ -114,6 +114,16 @@ public class irc_im_serv {
                   line = "user `" + remoteAddr + "` left this server.";
                   output.println(" ircIM: OK: joined channel `"+parts[1]+"`.");
                   System.out.println("debug: user `"+remoteAddr+"` joined channel `"+parts[1]+"`.");
+                  // Broadcast notification message to all sockets sharing the same channel
+                  for (Map.Entry<Socket, String> entry : wChannel.entrySet()) {
+                    if (parts[1].equals(entry.getValue())) {
+                      Socket targetSocket = entry.getKey(); PrintWriter targetOut = clientOutputs.get(targetSocket);
+                      if (targetOut != null) {
+                        targetOut.println("[" + currentChannel + "] " + remoteAddr + ": " + " user `"+remoteAddr+"` has joined this channel.");
+                      }
+                    }
+                  }
+
                 } else {
                   output.println(" ircIM: channel `" + parts[1] + "` is NOT A CHANNEL. (channels start with #)");
                   continue;
