@@ -10,6 +10,7 @@
 - *`C`*: is also allowed!
 - `Elixir`: is also okay!
 - `Java`: using java was a mistake, will never use again.
+- `Odin`: I had some misconceptions about odin, but I realized that I was wrong, long live odin.
 
 ### This repo has its own custom project manger *`mingle`*.
 - It also generates docmentations (using *`autodoc`*).
