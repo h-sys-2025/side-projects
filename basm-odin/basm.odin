@@ -390,7 +390,28 @@ main:
 
   mov 123, $a
   push $a
+  mov $a, $zzz
+  dup
   call fmt.println
+
+  mov 10, $qwerty
+  loop:
+    push $qwerty
+    dup
+    call fmt.println
+
+    push 1
+    sub
+    dup
+    pop $qwerty
+    jgz loop
+
+  push $zzz
+  dup
+  call fmt.println
+
+  mov 0, $zzz
+  mov 0, $a
 
   ; return with exit code 0: os.exit(0)
   halt
@@ -425,8 +446,7 @@ main:
   stack  : [dynamic]string // la-stack.
   reg    := make(map[string]string)
 
-  line := 0
-  raw_ptr := 0
+  raw_ptr :uint= 0
   for {
     if raw_ptr >= len(scanned_prg.tokens) {
       break
@@ -434,17 +454,83 @@ main:
     x := scanned_prg.tokens[raw_ptr]
     // fmt.println(x.type, " --> ", x.value)
     if x.type == .NEWLINE {
-      line += 1
       // continue
     } else if x.type == .MACRO {
       // how to define macros? lets just forget about them for now.
     } else if x.type == .LABEL {
-      labels[x.value] = x.position.line
+      name := x.value
+      if len(name) > 0 && name[len(name)-1] == ':' {
+          name = name[:len(name)-1]
+      }
+      labels[name] = uint(raw_ptr) // token index of the LABEL token
+      // fmt.println("defined:",name," at: ",raw_ptr)
     } else if x.type == .OPERATION {
       // now we handle all operations, push, pop, add, sub, mult, div, jmp, cmp and moreeeeee.......
       if x.value == "halt" {
         // os.exit(0)
         break
+      } else if x.value == "cmp" {
+        a_str := pop(&stack)
+        b_str := pop(&stack)
+
+        a, ok1 := strconv.parse_int(a_str, 10)
+        b, ok2 := strconv.parse_int(b_str, 10)
+
+        if ok1 && ok2 {
+          ww := 0
+          if a > b {
+            ww = 1
+          } else if a < b {
+            ww = -1
+          } else {
+            ww = 0
+          }
+          result_str := fmt.aprintf("%d", ww)
+          append(&stack, result_str)
+        } else {
+          fmt.println("runtime error: failed to parse stack values to integers.")
+        }
+      } else if x.value == "jmp" {
+        raw_ptr += 1
+        y := scanned_prg.tokens[raw_ptr]
+        if y.type == .OPERATION {
+          raw_ptr = labels[y.value]
+        } else {
+          fmt.println("runtime error: jmp expects a label name")
+        }
+      } else if x.value == "jz" {
+        raw_ptr += 1
+        y := scanned_prg.tokens[raw_ptr]
+        if y.type == .OPERATION {
+          w := pop(&stack)
+          if a, ok1 := strconv.parse_int(w, 10); a == 0 {
+            raw_ptr = labels[y.value]
+          }
+        } else {
+          fmt.println("runtime error: jmp expects a label name")
+        }
+      } else if x.value == "jgz" {
+        raw_ptr += 1
+        y := scanned_prg.tokens[raw_ptr]
+        if y.type == .OPERATION {
+          w := pop(&stack)
+          if a, ok1 := strconv.parse_int(w, 10); a > 0 {
+            raw_ptr = labels[y.value]
+          }
+        } else {
+          fmt.println("runtime error: jmp expects a label name")
+        }
+      } else if x.value == "jlz" {
+        raw_ptr += 1
+        y := scanned_prg.tokens[raw_ptr]
+        if y.type == .OPERATION {
+          w := pop(&stack)
+          if a, ok1 := strconv.parse_int(w, 10); a < 0 {
+            raw_ptr = labels[y.value]
+          }
+        } else {
+          fmt.println("runtime error: jmp expects a label name")
+        }
       } else if x.value == "push" {
         for {
           raw_ptr += 1
@@ -477,8 +563,22 @@ main:
           } else {
             fmt.println("expected a comma after value to mov.")
           }
+        } else if y.type == .REGISTER {
+          raw_ptr += 1
+          z := scanned_prg.tokens[raw_ptr]
+          if z.type == .COMMA {
+            raw_ptr += 1
+            w := scanned_prg.tokens[raw_ptr]
+            if w.type == .REGISTER {
+              reg[w.value] = reg[y.value]
+            } else {
+              fmt.println("expected a register, got:", w.type)
+            }
+          } else {
+            fmt.println("expected a comma after value to mov.")
+          }
         } else {
-          fmt.println("only support strings and number for now, considering this is a toy interpreter.")
+          fmt.println("only support $registers, strings and number for now, considering this is a toy interpreter.")
         }
       } else if x.value == "pop" {
         for {
@@ -593,6 +693,8 @@ main:
   }
 
   fmt.println("---\nstack: ", stack)
+  fmt.println("---\nregisters: ", reg)
+  fmt.println("---\nlabels", labels)
 
   /* Delete allocated globals.
   */
