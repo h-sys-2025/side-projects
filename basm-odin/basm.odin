@@ -396,6 +396,20 @@ main:
   halt
   `
 
+  /*
+  ; future
+  mov 0, $x
+  loop:
+    push 1
+    push $x
+    add
+    pop $z
+    mov $z, $x
+    push $x
+    call fmt.println
+    goto loop
+  */
+
   // scanning.
   scanned_prg := scan_this(contents)
   // test
@@ -481,6 +495,10 @@ main:
             break
           }
         }
+      } else if x.value == "dup" {
+        x := pop(&stack)
+        append(&stack, x)
+        append(&stack, x)
       } else if x.value == "call" {
         // keep pushing values o stak untill NEWLINE is encounteried.
         raw_ptr += 1
