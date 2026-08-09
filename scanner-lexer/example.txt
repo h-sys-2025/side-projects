@@ -1,0 +1,44 @@
+%native write
+%native exit
+
+add_4_numbers:
+%scope
+  ; get function arguments
+  pop zaa
+  pop zab
+  pop zac
+  pop zad
+
+  ; add all numbers
+  add zaa, zab
+  add zaa, zac
+  add zaa, zad
+
+  ; push the return value
+  push zaa
+
+  ret
+%end
+
+%entry main
+%scope
+  ; push function arguments
+  push 1
+  push 2
+  push 3
+  push 4
+  ; call function
+  jmp add_4_numbers
+
+  ; write(X,len)
+  pop zaa
+  push zaa
+  push zaa.len
+  call write
+
+  ; exit(0)
+  pop
+  push 0
+  call exit
+  ret
+%end
