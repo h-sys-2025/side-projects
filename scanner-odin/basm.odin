@@ -27,6 +27,7 @@ TokType :: enum {
   DOT,        // . (for member access)
   COLON,      // :
   MACRO,      // %scope (starts with %)
+  LABEL,      // main:
 
   EOF,
   UNREACHEABLE,
@@ -207,9 +208,57 @@ scan_this :: proc(program: string) -> Scanner {
         }
         break
       }
+      // if a operation ends with : then it is a label definition.
+      if peek(&scanner) == ":" {
+        append(&scanner.tokens, Token{
+          type = .LABEL,
+          value = strings.concatenate({operation,advance(&scanner)}),
+          position =  Position{
+            line = scanner.line,
+            col  = scanner.col
+          }
+        })
+      } else {
+        append(&scanner.tokens, Token{
+          type = .OPERATION,
+          value = operation,
+          position =  Position{
+            line = scanner.line,
+            col  = scanner.col
+          }
+        })
+      }
+    } else if this_tok == "$" { // parse operations
+      register := ""
+      for {
+        peek_ := peek(&scanner)
+        if unicode.is_alpha(rune(peek_[0])) {
+          register = strings.concatenate({register, advance(&scanner)})
+          continue
+        }
+        break
+      }
       append(&scanner.tokens, Token{
-        type = .OPERATION,
-        value = operation,
+        type = .REGISTER,
+        value = register,
+        position =  Position{
+          line = scanner.line,
+          col  = scanner.col
+        }
+      })
+    } else if unicode.is_number(rune(this_tok[0])) { // parse operations
+      number := this_tok
+      for {
+        peek_ := peek(&scanner)
+        if unicode.is_alpha(rune(peek_[0])) {
+          number = strings.concatenate({number, advance(&scanner)})
+          continue
+        }
+        break
+      }
+      append(&scanner.tokens, Token{
+        type = .NUMBER,
+        value = number,
         position =  Position{
           line = scanner.line,
           col  = scanner.col
@@ -310,25 +359,116 @@ main :: proc() {
   */
 
   contents := `
-%entry main
-%scope
+main:
   ; call fmt.println(string)
   push 'Hello, Sailor!'
   call fmt.println
 
   ; return with exit code 0: os.exit(0)
-  push 0
-  call os.exit ; program halts automatickly.
-%end
+  halt
   `
 
+  // scanning.
   scanned_prg := scan_this(contents)
+  /*
+    // test
+    for x in scanned_prg.tokens {
+      fmt.println(x.type)
+    }
+  */
+
+  // evaluating it directly. (easy-mode)
   // fmt.println(scanned_prg.raw_prg)
-  for x in scanned_prg.tokens {
-    fmt.println(x.type, ": ", x.value)
+  labels := make(map[string]uint)
+  stack  : [dynamic]string // la-stack.
+  reg    := make(map[string]string)
+
+
+  line := 0
+  raw_ptr := 0
+  for {
+    if raw_ptr >= len(scanned_prg.tokens) {
+      break
+    }
+    x := scanned_prg.tokens[raw_ptr]
+    if x.type == .NEWLINE {
+      line += 1
+      // continue
+    } else if x.type == .MACRO {
+      // how to define macros? lets just forget about them for now.
+    } else if x.type == .LABEL {
+      labels[x.value] = x.position.line
+    } else if x.type == .OPERATION {
+      // now we handle all operations, push, pop, add, sub, mult, div, jmp, cmp and moreeeeee.......
+      if x.value == "halt" {
+        os.exit(0)
+      } else if x.value == "push" {
+        for {
+          // keep pushing values o stak untill NEWLINE is encounteried.
+          raw_ptr += 1
+          y := scanned_prg.tokens[raw_ptr]
+          if y.type == .NEWLINE {
+            break
+          }
+
+          append(&stack, y.value)
+        }
+      } else if x.value == "pop" {
+        for {
+          // keep pushing values o stak untill NEWLINE is encounteried.
+          raw_ptr += 1
+          y := scanned_prg.tokens[raw_ptr]
+          if y.type == .NEWLINE {
+            break
+          } else if y.type == .REGISTER {
+            thing := pop(&stack) // pop from stack (with no safety features btw)
+            reg[y.value] = thing // assign to reg
+          } else {
+            fmt.println("runtime error: expected a $register, got: ", y.type)
+            break
+          }
+        }
+      } else if x.value == "call" {
+        // keep pushing values o stak untill NEWLINE is encounteried.
+        raw_ptr += 1
+        y := scanned_prg.tokens[raw_ptr]
+        if y.type == .OPERATION {
+          if y.value == "fmt" {
+            // inside fmt namespace.
+            raw_ptr += 1
+            z := scanned_prg.tokens[raw_ptr]
+            if z.type == .DOT {
+              raw_ptr += 1
+              w := scanned_prg.tokens[raw_ptr]
+              if w.type == .OPERATION {
+                if w.value == "println" {
+                  item := pop(&stack)
+                  fmt.println(item)
+                } else {
+                  fmt.println("runtime error: no definition for function `",w.value,"` found in namespace fmt")
+                  break
+                }
+              } else {
+
+              }
+            } else {
+              fmt.println("runtime error: expected a DOT for dot method access, but got: ", z.type)
+              break
+            }
+          }
+        } else {
+          fmt.println("runtime error: expected a function_name (which is of type operation), got: ", y.type)
+          break
+        }
+      }
+    }
+    raw_ptr += 1
   }
+
+  fmt.println(stack)
 
   /* Delete allocated globals.
   */
   delete(scanner_errors)
+  // delete(labels)
 }
