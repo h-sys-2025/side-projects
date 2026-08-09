@@ -246,12 +246,16 @@ scan_this :: proc(program: string) -> Scanner {
           col  = scanner.col
         }
       })
-    } else if unicode.is_number(rune(this_tok[0])) { // parse operations
-      number := this_tok
+    } else if unicode.is_number(rune(this_tok[0])) { // parse numbers
+      number := fmt.tprint(this_tok)
+      dot := false
       for {
         peek_ := peek(&scanner)
-        if unicode.is_alpha(rune(peek_[0])) {
+        if unicode.is_number(rune(peek_[0])) || (peek_ == "." && dot != true) {
           number = strings.concatenate({number, advance(&scanner)})
+          if peek_ == "." {
+            dot = true
+          }
           continue
         }
         break
@@ -364,16 +368,40 @@ main:
   push 'Hello, Sailor!'
   call fmt.println
 
+  push 34
+  push 35
+  call add
+  call fmt.println
+
+  push 34
+  push 35
+  call sub
+  call fmt.println
+
+  push 34
+  push 35
+  call mult
+  call fmt.println
+
+  push 34
+  push 35
+  call div
+  call fmt.println
+
+  mov 123, $a
+  push $a
+  call fmt.println
+
   ; return with exit code 0: os.exit(0)
   halt
   `
 
   // scanning.
   scanned_prg := scan_this(contents)
+  // test
   /*
-    // test
     for x in scanned_prg.tokens {
-      fmt.println(x.type)
+      fmt.println(x.type, " --> ", x.value)
     }
   */
 
@@ -383,7 +411,6 @@ main:
   stack  : [dynamic]string // la-stack.
   reg    := make(map[string]string)
 
-
   line := 0
   raw_ptr := 0
   for {
@@ -391,6 +418,7 @@ main:
       break
     }
     x := scanned_prg.tokens[raw_ptr]
+    // fmt.println(x.type, " --> ", x.value)
     if x.type == .NEWLINE {
       line += 1
       // continue
@@ -401,17 +429,42 @@ main:
     } else if x.type == .OPERATION {
       // now we handle all operations, push, pop, add, sub, mult, div, jmp, cmp and moreeeeee.......
       if x.value == "halt" {
-        os.exit(0)
+        // os.exit(0)
+        break
       } else if x.value == "push" {
         for {
-          // keep pushing values o stak untill NEWLINE is encounteried.
           raw_ptr += 1
           y := scanned_prg.tokens[raw_ptr]
           if y.type == .NEWLINE {
             break
+          } else if y.type == .REGISTER {
+            append(&stack, reg[y.value])
+          } else if y.type == .STRING || y.type == .NUMBER {
+            append(&stack, y.value)
+          } else {
+            fmt.println("runtime error: expected either $register or 'string' or number. got: ", y.type)
+            break
           }
-
-          append(&stack, y.value)
+        }
+      } else if x.value == "mov" {
+        raw_ptr += 1
+        y := scanned_prg.tokens[raw_ptr]
+        if y.type == .STRING || y.type == .NUMBER {
+          raw_ptr += 1
+          z := scanned_prg.tokens[raw_ptr]
+          if z.type == .COMMA {
+            raw_ptr += 1
+            w := scanned_prg.tokens[raw_ptr]
+            if w.type == .REGISTER {
+              reg[w.value] = y.value
+            } else {
+              fmt.println("expected a register, got:", w.type)
+            }
+          } else {
+            fmt.println("expected a comma after value to mov.")
+          }
+        } else {
+          fmt.println("only support strings and number for now, considering this is a toy interpreter.")
         }
       } else if x.value == "pop" {
         for {
@@ -455,6 +508,62 @@ main:
               fmt.println("runtime error: expected a DOT for dot method access, but got: ", z.type)
               break
             }
+          } else if y.value == "add" {
+
+            b_str := pop(&stack)
+            a_str := pop(&stack)
+
+            b, ok2 := strconv.parse_int(b_str, 10)
+            a, ok1 := strconv.parse_int(a_str, 10)
+
+            if ok1 && ok2 {
+              result_str := fmt.aprintf("%d", a + b)
+              append(&stack, result_str)
+            } else {
+              fmt.println("runtime error: failed to parse stack values to integers.")
+            }
+          } else if y.value == "sub" {
+
+            b_str := pop(&stack)
+            a_str := pop(&stack)
+
+            b, ok2 := strconv.parse_int(b_str, 10)
+            a, ok1 := strconv.parse_int(a_str, 10)
+
+            if ok1 && ok2 {
+              result_str := fmt.aprintf("%d", a - b)
+              append(&stack, result_str)
+            } else {
+              fmt.println("runtime error: failed to parse stack values to integers.")
+            }
+          } else if y.value == "mult" {
+
+            b_str := pop(&stack)
+            a_str := pop(&stack)
+
+            b, ok2 := strconv.parse_int(b_str, 10)
+            a, ok1 := strconv.parse_int(a_str, 10)
+
+            if ok1 && ok2 {
+              result_str := fmt.aprintf("%d", a * b)
+              append(&stack, result_str)
+            } else {
+              fmt.println("runtime error: failed to parse stack values to integers.")
+            }
+          } else if y.value == "div" {
+
+            b_str := pop(&stack)
+            a_str := pop(&stack)
+
+            b, ok2 := strconv.parse_int(b_str, 10)
+            a, ok1 := strconv.parse_int(a_str, 10)
+
+            if ok1 && ok2 {
+              result_str := fmt.aprintf("%d", a / b)
+              append(&stack, result_str)
+            } else {
+              fmt.println("runtime error: failed to parse stack values to integers.")
+            }
           }
         } else {
           fmt.println("runtime error: expected a function_name (which is of type operation), got: ", y.type)
@@ -465,7 +574,7 @@ main:
     raw_ptr += 1
   }
 
-  fmt.println(stack)
+  fmt.println("---\nstack: ", stack)
 
   /* Delete allocated globals.
   */
