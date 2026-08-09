@@ -46,16 +46,22 @@ halt
 void add_4_numbers(void)
 {
     SCOPE
+        /* declaring tempraries for allocation.
+        */
         ZTEMP(zaa);
         ZTEMP(zab);
         ZTEMP(zac);
         ZTEMP(zad);
 
+        /* popping values into predefined temporaries registers.
+        */
         pop(*zaa);
         pop(*zab);
         pop(*zac);
         pop(*zad);
 
+        /* perform add.
+        */
         add(*zaa, *zab);
         add(*zaa, *zac);
         add(*zaa, *zad);
