@@ -2,6 +2,15 @@
 - I want to learn assembly, but assambly is hard!
 - So why not create custom form of assembly? (more) with stack-trace when runtime-error happens? yes!!.
 
+#### usage:
+```sh
+gcc -std=c99 -Wall -Wextra -O2 -g -o example example.c zasm.c zasm.h
+gcc -std=c99 -Wall -Wextra -O2 -g -o crash_demo crash_demo.c zasm.c zasm.h
+./example
+./crash_demo || true
+rm -f example crash_demo
+```
+
 ### Examples:
 ```asm
 add_4_numbers:
