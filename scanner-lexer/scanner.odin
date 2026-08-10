@@ -160,6 +160,7 @@ scan_this :: proc(program: string) -> Scanner {
 }
 
 main :: proc() {
+  // I stil ldont know how to parse it.
   program :=
 `put (22 / 7) in $pi_value;
 put "Hello, Sailor" in $message
