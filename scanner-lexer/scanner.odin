@@ -51,6 +51,10 @@ scan_this :: proc(program: string) -> Scanner {
       line += 1
       col  = 0
       append(&scanner.ops, "\n")
+    } else if x == ";" {
+      line += 1
+      col  = 0
+      append(&scanner.ops, ";") // end stmt.
     } else if unicode.is_alpha(rune(x[0])) {
       word := x
       for {
@@ -60,7 +64,7 @@ scan_this :: proc(program: string) -> Scanner {
 
         w := code[ptr]
         // Peek ahead: only advance if it belongs to the alphabetic word
-        if unicode.is_alpha(rune(w[0])) || w == "_" {
+        if unicode.is_alpha(rune(w[0])) || w == "_" || w == "." {
           word = strings.concatenate({word, w})
           ptr += 1
           col += 1
@@ -79,7 +83,7 @@ scan_this :: proc(program: string) -> Scanner {
 
         w := code[ptr]
         // Peek ahead: only advance if it belongs to the register name
-        if unicode.is_alpha(rune(w[0])) || w == "_" {
+        if unicode.is_alpha(rune(w[0])) || w == "_" || w == "." {
           word = strings.concatenate({word, w})
           ptr += 1
           col += 1
@@ -157,14 +161,26 @@ scan_this :: proc(program: string) -> Scanner {
 
 main :: proc() {
   program :=
-`put (22 / 7) in $pi_value
+`put (22 / 7) in $pi_value;
 put "Hello, Sailor" in $message
 put $pi_value+2 in $whatever
 
 push ($pi_value * 1234 / 534 + 2354 - 4324)
 
 println $message
-println $whatever`
+println $whatever
+
+pop $popped
+free $popped
+
+push 99
+loop:
+  dup
+  push 1
+  sub
+  pop $x
+  jmp.gt.0 $x loop
+`
 
   scanner := scan_this(program)
   fmt.println(scanner.ops)
