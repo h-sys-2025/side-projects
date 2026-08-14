@@ -5,8 +5,7 @@
  *
  * To demonstrates how the JIT compiler emits native jumps for every control construct.
  *
- * To build: gcc -O3 -o jit1 control_basic_jit.c
- * To run:   ./jit1
+ * @build: gcc -O3 -o jit1 control_basic_jit.c
 
 _*_ Running: `gcc -Wall -Wextra /.../side-projects/JIT-compilers/control_basic_jit.c -o /tmp/gotermx_run && /tmp/gotermx_run` _*_
 
