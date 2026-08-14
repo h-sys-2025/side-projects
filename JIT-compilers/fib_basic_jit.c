@@ -118,6 +118,7 @@ static FibFn emit_fib(void) {
   return (FibFn)(code + start);
 }
 
+// this is 2x slower then our JIT.
 static int64_t fib_c(int64_t n) {
   if (n < 2) return n;
   return fib_c(n-1) + fib_c(n-2);
@@ -129,20 +130,18 @@ int main(int argc, char **argv) {
   code = mmap(NULL, code_cap, PROT_READ|PROT_WRITE|PROT_EXEC,
               MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
 
-  if (code == MAP_FAILED) {
-    perror("mmap");
-    return 1;
-  }
+  if (code == MAP_FAILED) { perror("mmap"); return 1; }
 
   FibFn fib = emit_fib();
-  for (int i = 0; i < 3; i++) fib(20);   /* warm */
+  {
+    for (int i = 0; i < 3; i++) fib(20);   /* warm start. */
+  }
 
   struct timespec t0, t1;
   clock_gettime(CLOCK_MONOTONIC, &t0);
   int64_t r = fib(n);
   clock_gettime(CLOCK_MONOTONIC, &t1);
   double jit_ms = (t1.tv_sec-t0.tv_sec)*1e3 + (t1.tv_nsec-t0.tv_nsec)*1e-6;
-
   clock_gettime(CLOCK_MONOTONIC, &t0);
   int64_t r2 = fib_c(n);
   clock_gettime(CLOCK_MONOTONIC, &t1);
@@ -150,7 +149,7 @@ int main(int argc, char **argv) {
 
   printf("fib(%d) = %lld\n", n, (long long)r);
   printf("JIT     : %.2f ms\n", jit_ms);
-  printf("C -O3   : %.2f ms\n", c_ms);
+  printf("C       : %.2f ms\n", c_ms);
   if (r != r2) { fprintf(stderr,"MISMATCH\n"); return 1; }
   return 0;
 }
