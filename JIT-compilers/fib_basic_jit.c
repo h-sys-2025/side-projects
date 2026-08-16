@@ -12,7 +12,7 @@ _*_ Running: `gcc -Wall -Wextra /.../side-projects/JIT-compilers/fib_basic_jit.c
 
 fib(35) = 9227465
 JIT     : 47.22 ms
-C -O3   : 84.22 ms
+C       : 84.22 ms
 
 Process completed with exit code: 0
 
