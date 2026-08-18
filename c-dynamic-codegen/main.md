@@ -11,5 +11,6 @@ import ccg {c_program, ret, varval, vardef, func_call}
 ```v
 //PRIVATE
 
+// just the basic idea, will continue soon!
 fn main() {
 ```
