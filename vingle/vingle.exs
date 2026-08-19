@@ -4,19 +4,19 @@
 
 defmodule Main do
   @vingle  "vingle"
-  @version "v1.0-operational"
+  @version "v1.1-operational"
 
   def main do
     # Access module attributes directly in the string interpolation
     IO.puts("#{vingle()} (#{version()})")
 
     argv = System.argv()
-    {target, _} =
+    {target, verbose} =
       case argv do
         [t] ->
-          {t, false}
-        [t, "--verbose"] ->
           {t, true}
+        [t, "--no-verbose"] ->
+          {t, false}
         _ ->
           usage()
           System.halt(1)
@@ -90,7 +90,7 @@ defmodule Main do
           entry = Path.join(cwd,entry)
           v_file = case extension do
             "v" ->
-              IO.puts(" -- autodoc: #{entry}")
+              if verbose do IO.puts(" -- autodoc: #{entry}") end
               # autodoc the .v files.
               command = "#{autodoc_file_path} #{entry}"
               # debug: IO.puts(command)
@@ -99,7 +99,7 @@ defmodule Main do
                 0 ->
                   # add them to entries list.
                   md_file_path = "#{Path.rootname(entry)}.md"
-                  IO.puts(" -- done: #{md_file_path}")
+                  if verbose do IO.puts(" -- done: #{md_file_path}") end
                   acc ++ [md_file_path]
                 _ ->
                   IO.puts(" -- possible failure:\n\t#{output}")
@@ -113,7 +113,7 @@ defmodule Main do
       end
     end)
 
-    IO.puts("preparing changes for commit!")
+    if verbose do IO.puts("preparing changes for commit!") end
     Enum.each(entries, fn entry ->
       case File.exists?(entry) do
         true ->
@@ -135,20 +135,20 @@ defmodule Main do
               # IO.puts(" -- exit_code: #{exit_code}")
               :err
           end
-          IO.puts("adds & commits: #{entry}")
+          if verbose do IO.puts("adds & commits: #{entry}") end
 
         _ ->
           :err
       end
     end)
 
-    IO.puts("preparing commits for push!")
+    if verbose do IO.puts("preparing commits for push!") end
     {output, exit_code} = System.cmd("sh", ["-c", "git push origin master"])
     case exit_code do
       0 ->
-        IO.puts(" -- Done!")
+        if verbose do IO.puts(" -- Done!") end
       _ ->
-        IO.puts("err: adding failed: #{exit_code}:\n\t#{output}")
+        if verbose do IO.puts("err: adding failed: #{exit_code}:\n\t#{output}") end
     end
   end
 
