@@ -394,17 +394,15 @@ main:
   dup
   call fmt.println
 
-  mov 10, $qwerty
+  mov 11, $qwerty
   loop:
+    dec $qwerty
     push $qwerty
     dup
     call fmt.println
 
-    push 1
-    sub
-    dup
     pop $qwerty
-    jgz loop
+    jg  $qwerty 0 loop
 
   push $zzz
   dup
@@ -498,38 +496,30 @@ main:
         } else {
           fmt.println("runtime error: jmp expects a label name")
         }
-      } else if x.value == "jz" {
+      } else if x.value == "jg" {
         raw_ptr += 1
         y := scanned_prg.tokens[raw_ptr]
-        if y.type == .OPERATION {
-          w := pop(&stack)
-          if a, ok1 := strconv.parse_int(w, 10); a == 0 {
-            raw_ptr = labels[y.value]
+        if y.type == .REGISTER {
+          raw_ptr += 1
+          z := scanned_prg.tokens[raw_ptr]
+          if z.type == .REGISTER {
+            raw_ptr += 1
+            a, ok1 := strconv.parse_int(reg[y.value], 10)
+            b, ok2 := strconv.parse_int(reg[z.value], 10);
+            if a > b {
+              raw_ptr += 1
+              ww := scanned_prg.tokens[raw_ptr]
+              if (ww.type == .OPERATION) {
+                raw_ptr = labels[z.value]
+              } else {
+                fmt.println("runtime error: usage: jg $a $b label")
+              }
+            }
+          } else {
+            fmt.println("runtime error: jg expects a register, register, label name")
           }
         } else {
-          fmt.println("runtime error: jmp expects a label name")
-        }
-      } else if x.value == "jgz" {
-        raw_ptr += 1
-        y := scanned_prg.tokens[raw_ptr]
-        if y.type == .OPERATION {
-          w := pop(&stack)
-          if a, ok1 := strconv.parse_int(w, 10); a > 0 {
-            raw_ptr = labels[y.value]
-          }
-        } else {
-          fmt.println("runtime error: jmp expects a label name")
-        }
-      } else if x.value == "jlz" {
-        raw_ptr += 1
-        y := scanned_prg.tokens[raw_ptr]
-        if y.type == .OPERATION {
-          w := pop(&stack)
-          if a, ok1 := strconv.parse_int(w, 10); a < 0 {
-            raw_ptr = labels[y.value]
-          }
-        } else {
-          fmt.println("runtime error: jmp expects a label name")
+          fmt.println("runtime error: jg expects a register, register, label name")
         }
       } else if x.value == "push" {
         for {
@@ -604,30 +594,7 @@ main:
         raw_ptr += 1
         y := scanned_prg.tokens[raw_ptr]
         if y.type == .OPERATION {
-          if y.value == "fmt" {
-            // inside fmt namespace.
-            raw_ptr += 1
-            z := scanned_prg.tokens[raw_ptr]
-            if z.type == .DOT {
-              raw_ptr += 1
-              w := scanned_prg.tokens[raw_ptr]
-              if w.type == .OPERATION {
-                if w.value == "println" {
-                  item := pop(&stack)
-                  fmt.println(item)
-                } else {
-                  fmt.println("runtime error: no definition for function `",w.value,"` found in namespace fmt")
-                  break
-                }
-              } else {
-
-              }
-            } else {
-              fmt.println("runtime error: expected a DOT for dot method access, but got: ", z.type)
-              break
-            }
-          } else if y.value == "add" {
-
+          if y.value == "add" {
             b_str := pop(&stack)
             a_str := pop(&stack)
 
@@ -641,7 +608,6 @@ main:
               fmt.println("runtime error: failed to parse stack values to integers.")
             }
           } else if y.value == "sub" {
-
             b_str := pop(&stack)
             a_str := pop(&stack)
 
@@ -655,7 +621,6 @@ main:
               fmt.println("runtime error: failed to parse stack values to integers.")
             }
           } else if y.value == "mult" {
-
             b_str := pop(&stack)
             a_str := pop(&stack)
 
@@ -669,7 +634,6 @@ main:
               fmt.println("runtime error: failed to parse stack values to integers.")
             }
           } else if y.value == "div" {
-
             b_str := pop(&stack)
             a_str := pop(&stack)
 
@@ -683,9 +647,50 @@ main:
               fmt.println("runtime error: failed to parse stack values to integers.")
             }
           }
+        } else if x.value == "dec" {
+          raw_ptr += 1
+          y := scanned_prg.tokens[raw_ptr]
+          if y.type == .REGISTER {
+              val, ok := strconv.parse_int(reg[y.value], 10)
+              if ok {
+                  reg[y.value] = fmt.aprintf("%d", val - 1)
+              } else {
+                  fmt.println("runtime error: failed to parse register value as integer")
+              }
+          } else {
+              fmt.println("only support $registers.")
+          }
+        } else if x.value == "inc" {
+          raw_ptr += 1
+          y := scanned_prg.tokens[raw_ptr]
+          if y.type == .REGISTER {
+              val, ok := strconv.parse_int(reg[y.value], 10)
+              if ok {
+                  reg[y.value] = fmt.aprintf("%d", val + 1)
+              } else {
+                  fmt.println("runtime error: failed to parse register value as integer")
+              }
+          } else {
+              fmt.println("only support $registers.")
+          }
         } else {
-          fmt.println("runtime error: expected a function_name (which is of type operation), got: ", y.type)
-          break
+            func_name := ""
+            for {
+                raw_ptr += 1
+                z := scanned_prg.tokens[raw_ptr]
+                if (z.type == .NEWLINE) {break}
+                else {
+                    func_name = strings.concatenate({func_name, z.value})
+                }
+            }
+
+            if (func_name == "fmt.println") {
+                fmt.println(pop(&stack))
+            }
+            else {
+                fmt.println("runtime error: expected a function_name (which is of type operation), got: ", y.type)
+                break
+            }
         }
       }
     }
