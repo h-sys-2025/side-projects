@@ -9,6 +9,7 @@ enum TokenType {
   keyword
   special
   eof
+  newline
 }
 
 struct Position {
@@ -68,6 +69,11 @@ fn (mut s Scanner) skip_whitespace() {
   for !s.at_end() {
     c := s.curr()
     if c == ' ' || c == '\t' || c == '\r' || c == '\n' {
+      s.scanned_program << Token{
+        toktype: .newline
+        data: c
+        pos: Position{}
+      }
       s.advance()
     } else {
       break
@@ -183,7 +189,7 @@ pub fn scan(program string) []Token {
   }
   s.scanned_program << Token{
     toktype: .eof
-    data: ""
+    data: "\n"
     pos: Position{}
   }
   return s.scanned_program
@@ -198,13 +204,15 @@ fn is_digit(ch string) bool {
 }
 
 fn main() {
-  println(
-    scan(
+  lexed := scan(
       os.read_file("./example.txt") or {
         eprintln("error reading file: ${err}")
         return
       }
     )
-  )
+  println("printing, fmt-ed program.")
+  for x in lexed {
+    print("${x.data}")
+  }
   return
 }
