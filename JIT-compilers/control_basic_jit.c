@@ -166,7 +166,7 @@ static Fn emit_abs(void) {
   llabel("neg");
   e8(0x48); e8(0x89); e8(0xf8);           /* mov rax, rdi */
   e8(0x48); e8(0xf7); e8(0xd8);           /* neg rax */
-  e8(0xc3);
+  e8(0xc3);                               /* ret **/
 
   patch_all(start);
   return (Fn)(code + start);
@@ -207,9 +207,9 @@ int main(void) {
   // speed-comparison: for-loop style sum, this is very slow!.
   t0 = now_ms();
   int64_t r = 0;
-  for (int i = 0; i < 200; i++) r += sum_to(100000000);
+  for (int i = 0; i < 10; i++) r += sum_to(1000000000);
   t = now_ms() - t0;
-  printf("\nrunning sum_to(1,000,000,000) 200 times --- JIT for-loop : %.2f ms  (result %lld)\n", t, (long long)r);
+  printf("\nrunning sum_to(1,000,000,000) 10 times --- JIT for-loop : %.2f ms  (result %lld)\n", t, (long long)r);
 
   return 0;
 }
