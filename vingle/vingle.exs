@@ -69,13 +69,13 @@ defmodule Main do
     #   end
     # commands = Enum.join(commands, " && ")
 
-    IO.puts("preparing .v files for autodoc!")
+    if verbose do IO.puts("preparing .v files for autodoc!") end
     autodoc_file_path = "/home/dzebra/Work/probe/Programming/hsys25/side-projects/autodoc/autodoc"
     case File.exists?(autodoc_file_path) do
       true ->
         nil
       _ ->
-        IO.puts("autodoc file does not exist or is not accessable.")
+        if verbose do IO.puts("autodoc file does not exist or is not accessable.") end
         System.halt(1)
     end
 
