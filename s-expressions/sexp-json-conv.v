@@ -107,9 +107,10 @@ fn recursize_sexpressions_to_json(lisp_code string) string {
   return ast.str()
 }
 
+
 fn main() {
-  example := "
-(
+  example :=
+"(
   (1 2 3 4 5 6 7 8 9 0)
   (def add (a b c e) (
     (return (+ a b c d))
@@ -117,5 +118,5 @@ fn main() {
   (setq result (add (1 1 2 3)))
   (printf(result))
 )"
-println(recursize_sexpressions_to_json(example))
+  println(recursize_sexpressions_to_json(example))
 }
