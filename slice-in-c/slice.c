@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+static inline void isNULL(char* res) {
+  if (res == NULL) abort(); // looking for NULL pointers.
+}
+
 /*
   # slice:
   - simple abstraction for slice things in `C` language. only supports `char*` for now.
@@ -25,7 +29,7 @@ char *slice(char *sentence, size_t i, size_t j) {
 
   // critical memory allocation for slice, only `C` folkes might understand.
   char *res = malloc((len + 1) * sizeof(char));
-  if (res == NULL) return res; // looking for NULL pointers.
+  isNULL(res); // looking for NULL pointers.
 
   memcpy(res, &sentence[i], len); /* mov res, [sentence+len] */
   res[len] = '\0'; // also put a trailing null byte.
