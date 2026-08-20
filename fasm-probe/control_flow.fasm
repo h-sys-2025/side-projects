@@ -1,0 +1,134 @@
+format ELF64 executable 3
+entry start
+
+segment readable executable
+
+; ==========================================
+; fasm even has some macros, nice.
+; these things control what code is generated, more like C's macro system.
+
+TEST_MODE = 1
+if TEST_MODE = 1
+    MSG_MODE db 'assambly time macro proprecessing IF: foo', 10
+    MSG_MODE_LEN = $ - MSG_MODE
+else
+    MSG_MODE db 'assambly time macro preprocessing IF: bar', 10
+    MSG_MODE_LEN = $ - MSG_MODE
+end if ; syntax is like pascal, or maybe like Ada.
+
+; it even has a `repeat` macro.
+square_table: ; so lets create a small loopup table for squares. just a foo/bar like example.
+repeat 5
+    db (% * %)  ; % is the iteration counter (1-based)
+end repeat
+SQUARE_TABLE_LEN = 5
+
+; generates the powers of 2 until the value > (this can be done using jg in normal fasm, maybe.) 50
+power = 1
+power_table:
+while power <= 50
+    db power
+    power = power * 2
+    if power > 50
+        break  ; Exit while early if condition met
+    end if
+end while
+POWER_TABLE_LEN = $ - power_table
+
+; ==========================================
+; this will execute when the program starts running.
+
+start:
+    mov rdi, 1          ; stdout
+    mov rsi, MSG_MODE
+    mov rdx, MSG_MODE_LEN
+    mov rax, 1          ; sys_write
+    syscall
+
+    jmp test_jmp_turing_complete_ness ; this is a label, NOT a function. functions have `ret` at the end.
+
+    ; This code is skipped by jmp
+    db 'UNREACHABLE CODE', 10
+
+test_jmp_turing_complete_ness:
+    ; cmp: compare, je: ==, jl: <, jg: >, jge: >=, jle: <=, jng: !>, jnl: !<, (jnge: !>=, jnle: !<= -- these I am not sure about.)
+    mov rax, 10 ; lets just pretend that rax and rbx are our variables. (although I never use tham as variables.)
+    mov rbx, 20
+
+    ; The following example does this:
+    ; if (rax < rbx) goto is_less; (Equvalent code written in C)
+    cmp rax, rbx ; compairing rax and rbx
+    jl  is_less  ; jmp only if less (uses int, not uint)
+
+    mov rdi, 1 ; write something.
+    mov rsi, msg_greater
+    mov rdx, msg_greater_len
+    mov rax, 1
+    syscall
+    jmp test_loop_instr ; anathor jmp, this is crutial in TURING-COMPLETE-NESS.
+
+is_less:
+    ; just print the `msg_less` message.
+    mov rdi, 1
+    mov rsi, msg_less
+    mov rdx, msg_less_len
+    mov rax, 1
+    syscall
+
+test_loop_instr:
+    ; writes "Loop" 5 times using `ecx` and LOOP instruction.
+    mov ecx, 5
+loop_label:
+    push rcx            ; push it into stack to save its value, and use `rcx` register for sometihng else, classy shadow trick.
+    mov rdi, 1
+    mov rsi, msg_loop
+    mov rdx, msg_loop_len
+    mov rax, 1
+    syscall
+    pop rcx             ; re-store counter(variable) into rcx.
+    loop loop_label     ; Decrement `ecx`, jump if `ecx` != 0
+
+    ; procedure calling testing using `call` and `ret`, just like good old BASIC.
+    ; mov rdi, 100
+    ; call print_number_formatted ; it was buggy so I gave up on it.
+    ; because of call, this location is pushed into stack, so funtion know WHERE to return, this is the reason why JAVA does something called STACK-TRACE, the reason I quit java after 1hr of starting it.
+
+    ; indirect jump, putting the target_indirect's address into rax and then using `rax` in `jmp` thing.
+    mov rax, target_indirect
+    jmp rax             ; Jump to address in RAX
+
+target_indirect:
+    mov rdi, 1
+    mov rsi, msg_indirect
+    mov rdx, msg_indirect_len
+    mov rax, 1
+    syscall
+
+    ; Exit program
+    mov rax, 60         ; exiting
+    xor rdi, rdi        ; `xor`-ing anyalue to itself results in a `0`.
+    syscall
+
+; ==========================================
+; this is the data section.
+; I am wondering weather we can or store image data, or why not?
+
+segment readable writeable
+
+msg_less db 'runtime:::::  conditional: 10 < 20', 10
+msg_less_len = $ - msg_less
+
+msg_greater db 'runtime:::::  conditional: 10 >= 20', 10
+msg_greater_len = $ - msg_greater
+
+msg_loop db 'runtime:::::  LOOP thing executed successfilly', 10
+msg_loop_len = $ - msg_loop
+
+msg_num_prefix db 'the number: ', 0
+msg_num_prefix_len = $ - msg_num_prefix
+
+msg_placeholder db '*', 0
+msg_newline db 10, 0
+
+msg_indirect db 'runtime:::::  jmp successfull, using rax for the address of the label.', 10
+msg_indirect_len = $ - msg_indirect
