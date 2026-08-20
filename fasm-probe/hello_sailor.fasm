@@ -1,0 +1,21 @@
+format ELF64 executable 3
+
+segment readable executable
+    entry start
+
+start:
+    ; using systemm `sys_write` to write some things to stdout.
+    mov rax, 1 ; sys_write is syscall number 1.
+    mov rdi, 1 ; stdout if 1, 2 is stderr, and 3 is I think something else, maybe? idk!
+    mov rsi, msg
+    mov rdx, msg_size
+    syscall
+
+    ; sys_exit (syscall number 60) with exit-code 0.
+    mov rax, 60 ; rax register holds the number of syscall.
+    mov rdi, 0  ; golds the first argument of a syscall.
+    syscall
+
+segment readable writeable ; public data.
+    msg db "Hello, Sailor!", 10
+    msg_size = $ - msg ; $ means something I forgot.
