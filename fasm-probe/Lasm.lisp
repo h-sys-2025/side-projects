@@ -65,3 +65,61 @@
 //
 
 ```
+
+- more:
+```flisp
+// FASLisp example with inline strings
+(format ELF64 executable 3)
+
+(segment readable executable
+  (entry :start)
+
+  (label :start
+    (syscall
+      (setq rax 1)
+      (setq rdi 1)
+      (setq rsi $_1:"Hello, Sailor!!!!!") // this $_1 is generated with a random naem and substituted.
+      (setq rdx $_1:len))
+
+    // sys_exit
+    (syscall
+      (setq rax 60)
+      (setq rdi 0))))
+```
+
+- more: v0.2.0:
+```flisp
+(import "std.flisp")
+
+(format ELF64 executable 3)
+
+(segment readable executable
+  (entry :start)
+
+  (label :start
+    // load two numbers.
+    (setq rax 10)
+    (setq rbx 10)
+
+    // if (rax == rbx) print("equal\n");
+    (if (rax :== rbx) /*if is a macro, defined in std.flisp, and yes this actully works!!!*/
+      (syscall
+        (setq rax 1)
+        (setq rdi 1)
+        (setq rsi msg_eq:"equal\n")
+        (setq rdx msg_eq:len)))
+
+    // if (rax != 99) print("not99\n");
+    (setq rax 10)
+    (if (rax :!= 99)
+      (syscall
+        (setq rax 1)
+        (setq rdi 1)
+        (setq rsi msg_n:"not99\n")
+        (setq rdx msg_n:len)))
+
+    // exit with exit-code 0
+    (syscall
+      (setq rax 60)
+      (setq rdi 0))))
+```
