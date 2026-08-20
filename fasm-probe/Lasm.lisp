@@ -123,6 +123,7 @@
       (setq rax 60)
       (setq rdi 0))))
 ```
+and
 ```flisp
 (import "std.flisp")
 
