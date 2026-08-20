@@ -39,10 +39,10 @@ POWER_TABLE_LEN = $ - power_table
 ; this will execute when the program starts running.
 
 start:
-    mov rdi, 1          ; stdout
-    mov rsi, MSG_MODE
-    mov rdx, MSG_MODE_LEN
-    mov rax, 1          ; sys_write
+      mov rdi, 1          ; stdout
+      mov rsi, MSG_MODE
+      mov rdx, MSG_MODE_LEN
+      mov rax, 1          ; sys_write
     syscall
 
     jmp test_jmp_turing_complete_ness ; this is a label, NOT a function. functions have `ret` at the end.
@@ -60,19 +60,19 @@ test_jmp_turing_complete_ness:
     cmp rax, rbx ; compairing rax and rbx
     jl  is_less  ; jmp only if less (uses int, not uint)
 
-    mov rdi, 1 ; write something.
-    mov rsi, msg_greater
-    mov rdx, msg_greater_len
-    mov rax, 1
+      mov rdi, 1 ; write something.
+      mov rsi, msg_greater
+      mov rdx, msg_greater_len
+      mov rax, 1
     syscall
     jmp test_loop_instr ; anathor jmp, this is crutial in TURING-COMPLETE-NESS.
 
 is_less:
     ; just print the `msg_less` message.
-    mov rdi, 1
-    mov rsi, msg_less
-    mov rdx, msg_less_len
-    mov rax, 1
+      mov rdi, 1
+      mov rsi, msg_less
+      mov rdx, msg_less_len
+      mov rax, 1
     syscall
 
 test_loop_instr:
@@ -80,10 +80,10 @@ test_loop_instr:
     mov ecx, 5
 loop_label:
     push rcx            ; push it into stack to save its value, and use `rcx` register for sometihng else, classy shadow trick.
-    mov rdi, 1
-    mov rsi, msg_loop
-    mov rdx, msg_loop_len
-    mov rax, 1
+      mov rdi, 1
+      mov rsi, msg_loop ; the message to print. Why can't I just write the string here?
+      mov rdx, msg_loop_len ; the lenght ofcourse.
+      mov rax, 1
     syscall
     pop rcx             ; re-store counter(variable) into rcx.
     loop loop_label     ; Decrement `ecx`, jump if `ecx` != 0
@@ -98,15 +98,15 @@ loop_label:
     jmp rax             ; Jump to address in RAX
 
 target_indirect:
-    mov rdi, 1
-    mov rsi, msg_indirect
-    mov rdx, msg_indirect_len
-    mov rax, 1
+      mov rdi, 1
+      mov rsi, msg_indirect
+      mov rdx, msg_indirect_len
+      mov rax, 1
     syscall
 
     ; Exit program
-    mov rax, 60         ; exiting
-    xor rdi, rdi        ; `xor`-ing anyalue to itself results in a `0`.
+      mov rax, 60         ; exiting
+      xor rdi, rdi        ; `xor`-ing anyalue to itself results in a `0`.
     syscall
 
 ; ==========================================
