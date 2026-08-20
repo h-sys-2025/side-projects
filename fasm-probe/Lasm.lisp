@@ -123,3 +123,26 @@
       (setq rax 60)
       (setq rdi 0))))
 ```
+```flisp
+(import "std.flisp")
+
+(format ELF64 executable 3)
+
+(segment readable executable
+  (entry :start)
+
+  (label :start
+    (defvar counter) // this allocates a variable for us, awsome.
+    (defvar msgptr :ptr) // with pointer support too.
+
+    (setq rax 0)
+    (setq counter rax)          // set `counter` to `0`  (using register for now)
+
+    (while (rax :< 3)
+      (write-str "tick\n") // this invokes syscall sys_write.
+      (setq rax counter)
+      (add rax 1)
+      (setq counter rax))
+
+    (exit 0)))
+```
