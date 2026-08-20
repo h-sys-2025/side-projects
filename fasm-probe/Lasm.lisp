@@ -1,0 +1,65 @@
+// My version of somewhat assambler, fixing all problems (which somepeople may call my skill issues) which are present in fasm.
+
+- Inline strings.
+- More powerfull macros.
+- Lisp syntax, S-Expressions.
+
+```lisp
+// format ELF64 executable 3
+
+(segment readable executable
+  (entry :start) // when using a label, always use it as an atom. Everything which is NOT a builtin keyword MUST be used as an :atom.
+)
+
+// :name is a label.
+(label :start ( // defining the label for the entrypoint.
+  (syscall (
+    (setq rax 1)
+    (setq rdi 1)
+    (setq rsi msg)
+    (setq rdx msg_size)
+  ))
+
+  // sys_exit (syscall number 60) with exit-code 0.
+  (syscall (
+    (setq rax 60) // rax register holds the number of syscall.
+    (setq rdi 0)  // golds the first argument of a syscall.
+  ))
+))
+
+(segment :read :write ( // it means `readable writeable`.
+  (setq msg "Hello, Sailor!")
+  (setq msg_size msg:len) /*translates to: `$ - msg`*/
+))
+```
+
+- Macros:
+```lisp
+
+(defmacro if (x y z) (...w) (
+  (temp $p $$random) ; just for preprocessor, do not generate any real code.
+  (temp $q $$random)
+  (cmp $x $z) ; $x $y $z $w are just macro things, they are substituted as-it-is.
+  (jmp $p)
+  (label $q)
+  (...$w)
+  (label $p)
+  ($y $q) ; random is a builtin things which substitutes random identifiers, can be used for defining labels and whatever. it never generates same random identifier again, so it is safe for using with labels.
+))
+
+(if (rax :>= rdi) ( // user can make this like python3, make loops, and other things.
+  (jmp :ok)
+))
+
+//
+// - translates to:
+//
+// (cmp rax rdi)
+// (jmp XXXXXXXXXX)
+// (label YYYYYYYYYY)
+// (jmp :ok)
+// (label XXXXXXXXXX)
+// (jge YYYYYYYYYY)
+//
+
+```
