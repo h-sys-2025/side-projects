@@ -39,7 +39,7 @@ char *slice(char *sentence, size_t i, size_t j) {
 
 int main() {
   char *sentence = "The quick brown fox jumps higher then the lazy dog.";
-  char *sliced = slice(sentence, 11, 69);
+  char *sliced = slice(sentence, 25, 51);
 
   if (sliced != NULL) { // pointer trouble.
     printf("%s\n", sliced);
