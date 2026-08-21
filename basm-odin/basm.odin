@@ -402,7 +402,8 @@ main:
     call fmt.println
 
     pop $qwerty
-    jg  $qwerty 0 loop
+    mov 0, $aaaaaaa
+    jg  $qwerty $aaaaaaa loop
 
   push $zzz
   dup
@@ -516,10 +517,10 @@ main:
               }
             }
           } else {
-            fmt.println("runtime error: jg expects a register, register, label name")
+            fmt.println("@1runtime error: jg expects a register, register, label name")
           }
         } else {
-          fmt.println("runtime error: jg expects a register, register, label name")
+          fmt.println("@runtime error: jg expects a register, register, label name")
         }
       } else if x.value == "push" {
         for {
