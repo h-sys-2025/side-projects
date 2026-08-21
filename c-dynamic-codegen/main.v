@@ -9,6 +9,8 @@ fn main() {
 
   // main function.
   hello_world.new_func("main", "int", ["int argc", "char** argv"])
+
+
   hello_world.func_add_stmt("main",
     vardef("char*", "message", "\"Hello, Sailor!\"")
   )
@@ -16,6 +18,8 @@ fn main() {
     func_call("printf",[varval("message")])
   )
   hello_world.func_add_stmt("main", ret("0"))
+
+
   hello_world.print_func("main")
   return
 }
