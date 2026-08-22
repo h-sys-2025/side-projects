@@ -1,0 +1,1 @@
+- I tried to write it in `V`, but `V` has many `hidden undiscovered issues` so for some time, I am aandoning `V`. `Odin` shall be my next pal.
