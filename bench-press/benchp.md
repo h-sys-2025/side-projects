@@ -17,12 +17,12 @@ fn main() {
 ```v
 //PRIVATE
 
-fn run_command(cmd string) CommandResult {
+fn run_this_command_please(cmd string) Cmd_res_thing {
 ```
 
 ## Structs:
 ```v
 //PRIVATE
 
-struct CommandResult {
+struct Cmd_res_thing {
 ```
