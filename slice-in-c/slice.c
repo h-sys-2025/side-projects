@@ -50,7 +50,7 @@ char *slice(char *sentence, size_t i, size_t j) {
 // main
 int main() {
   char *sentence = "The quick brown fox jumps higher then the lazy dog.";
-  char *sliced = slice(sentence, 26, 51); // print sentence[26..51];
+  char *sliced = slice(sentence, 26, 51); // slice sentence[26..51]; // using `slice` macro
 
   if (sliced != NULL) { // pointer trouble.
     printf("%s\n", sliced);
