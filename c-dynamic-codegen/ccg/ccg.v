@@ -66,4 +66,5 @@ pub fn func_call(name string, args []string) string {
 //@ print the function in console
 pub fn (mut c_cg C_dyn_ccg) print_func(name string) {
   mut func := c_cg.functions[name]
-  println("${func.ret_type} ${func.name}(${func.args.join(", ")}) {\n  ${func.body.join("\n  ")}\n}")}
+  println("${func.ret_type} ${func.name}(${func.args.join(", ")}) {\n  ${func.body.join("\n  ")}\n}")
+}
