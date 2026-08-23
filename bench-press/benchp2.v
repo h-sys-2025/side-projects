@@ -26,7 +26,7 @@ fn main() {
 
  	// now lets spawn some threads for each command.
  	for cmd in conf_cmds {
-    println(":. starting \"${cmd}\"")
+    println(":. starting \"${cmd}\".")
  	  threads << spawn run_command(cmd)
  	}
   results := threads.wait()
@@ -57,7 +57,7 @@ fn run_command(cmd string) CommandResult {
 
   // to xecute the thing(command or process) using `sh -c` to run via `sh`.
   result := os.execute_opt("sh -c \"${cmd}\"") or {
-   		eprintln("{!!} failed to execute \"${cmd}\"")
+   		eprintln("{!!} failed to execute \"${cmd}\".")
    		return CommandResult{
     			cmd: cmd
     			exit_code: -1
