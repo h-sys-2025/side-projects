@@ -36,15 +36,29 @@ char *slice(char *sentence, size_t i, size_t j) {
 
   return res;
 }
+/*
+  blackhole89/macros --> supercool macros.
+*/
 
+// #define blackhole89
+#ifdef blackhole89
+  @define slice {
+    ( @$arr [ @$start .. @$end ] ) => ( slice($arr, $start, $end) )
+  }
+#endif
+
+// main
 int main() {
   char *sentence = "The quick brown fox jumps higher then the lazy dog.";
-  char *sliced = slice(sentence, 25, 51);
+  char *sliced = slice(sentence, 26, 51); // print sentence[26..51];
 
   if (sliced != NULL) { // pointer trouble.
     printf("%s\n", sliced);
     free(sliced);
   }
 
+  #ifdef blackhole89
+  printf("using slice macro: %s\n", slice sentence[26..51]);
+  #endif
   return 0;
 }
