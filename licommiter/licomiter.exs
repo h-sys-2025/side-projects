@@ -55,55 +55,6 @@ defmodule Main do
           {false, [target]}
       end
 
-    # {commands} =
-    #   case is_dir do
-    #     true ->
-    #       {["git add #{Enum.join(entries, " ")}"]}
-    #     _ ->
-    #       {["git add #{Enum.at(entries,  0)}"]}
-    #   end
-    # commands = Enum.join(commands, " && ")
-
-    autodoc_file_path = "/home/dzebra/Work/probe/Programming/hsys25/side-projects/autodoc/autodoc"
-    case File.exists?(autodoc_file_path) do
-      true ->
-        nil
-      _ ->
-        System.halt(1)
-    end
-
-    cwd = File.cwd!()
-    entries = Enum.reduce(entries, entries, fn entry, acc ->
-      u1 = String.split(entry,".")
-      case u1 > 0 do
-        true ->
-          extension = u1
-            |> Enum.at(-1)
-
-          entry = Path.join(cwd,entry)
-          v_file = case extension do
-            "v" ->
-              # autodoc the .v files.
-              command = "#{autodoc_file_path} #{entry}"
-              # debug: IO.puts(command)
-              {output, exit_code} = System.cmd("sh",["-c",command])
-              case exit_code do
-                0 ->
-                  # add them to entries list.
-                  md_file_path = "#{Path.rootname(entry)}.md"
-                  acc ++ [md_file_path]
-                _ ->
-                  IO.puts(" -- possible failure:\n\t#{output}")
-                  acc
-              end
-            _ ->
-              acc
-          end
-        _ ->
-          acc
-      end
-    end)
-
     Enum.each(entries, fn entry ->
       case File.exists?(entry) do
         true ->
