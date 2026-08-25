@@ -134,7 +134,8 @@ defmodule Main do
     {output, exit_code} = System.cmd("sh", ["-c", "git branch"])
     case exit_code do
       0 -> :ok
-      _ -> IO.puts()
+      _ -> IO.puts("error!!!")
+        System.halt(1)
     end
     branch_name =
       output
