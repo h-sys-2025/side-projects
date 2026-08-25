@@ -35,7 +35,7 @@ defmodule Main do
     end
 
     # add all changes first, because somewhy it is not doing it!
-    {_, exit_code} = System.cmd("sh",["-c","cd #{target} && git add ."])
+    {_, _} = System.cmd("sh",["-c","cd #{target} && git add ."])
 
     found = Enum.find(File.ls!(target), fn x -> x == ".git" end)
     case found do
@@ -94,7 +94,7 @@ defmodule Main do
       |> Enum.at(-1)
     IO.puts(branch_name)
 
-    {_, exit_code} = System.cmd("sh", ["-c", "git push origin #{branch_name}"])
+    {_, _} = System.cmd("sh", ["-c", "git push origin #{branch_name}"])
   end
 
   def usage do
