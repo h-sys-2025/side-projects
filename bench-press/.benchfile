@@ -1,0 +1,8 @@
+# run something very slow.
+sleep 2
+# again some anathor thing which is also very slow.
+sleep 1
+# anathor one.
+sleep 3
+# uncomment to see the error.
+# dium9s8ay0f8dsnufhmdnsufbsgygnodh;  dfnsfjkdsnfkjhs

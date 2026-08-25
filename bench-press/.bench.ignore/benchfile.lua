@@ -1,0 +1,2 @@
+path = "/home/dzebra/Work/probe/Programming/hsys25/side-projects/bench-press/.bench.ignore/"
+cmd  = "cd /home/dzebra/Work/probe/Programming/hsys25/side-projects/bench-press/.bench.ignore/ && ./bench_copy"
