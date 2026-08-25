@@ -1,0 +1,10 @@
+- [X] JIT compilers.
+- [X] Lexers+Parsers.
+- [X] Odin, Elixir, Java, V, C.
+- [ ] rustc-diag.
+- [X] Interpreters (Odin-basm).
+- [X] Assambly language (fasm-probe).
+- [ ] ByteCode interpreter.
+- [ ] Reverse Engineerr engine.
+- [ ] AsmJit compiler.
+- [X] C compiler syntax-sugar. (view it here: [chibicc-sugar](https://github.com/ProbeOpt/chibicc))
