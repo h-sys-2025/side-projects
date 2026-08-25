@@ -98,7 +98,7 @@ defmodule Main do
   end
 
   def usage do
-    IO.puts("Usage: licommiter <file> [options]")
+    IO.puts("Usage: licommiter <dir/path> [options]")
   end
 
   def contents(target) do
@@ -128,4 +128,5 @@ defmodule Main do
   end
 end
 
-Main.main()
+# Main.main()
+IO.puts("this is depricated, use './licomiter.erl' instead.")

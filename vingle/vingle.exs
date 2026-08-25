@@ -153,7 +153,7 @@ defmodule Main do
   end
 
   def usage do
-    IO.puts("Usage: #{vingle()} <file> [options]")
+    IO.puts("Usage: #{vingle()} <dir/path> [options]")
   end
 
   def contents(target) do
