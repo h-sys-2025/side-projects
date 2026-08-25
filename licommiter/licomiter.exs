@@ -141,10 +141,8 @@ defmodule Main do
       |> String.split(" ")
       |> Enum.at(-1)
     IO.puts(branch_name)
-            System.halt(1)
 
     {output, exit_code} = System.cmd("sh", ["-c", "git push origin #{branch_name}"])
-
   end
 
   def usage do
