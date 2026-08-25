@@ -35,7 +35,7 @@ defmodule Main do
     end
 
     # add all changes first, because somewhy it is not doing it!
-    {output, exit_code} = System.cmd("sh",["-c","cd #{target} && git add ."])
+    {_, exit_code} = System.cmd("sh",["-c","cd #{target} && git add ."])
 
     found = Enum.find(File.ls!(target), fn x -> x == ".git" end)
     case found do
@@ -47,7 +47,7 @@ defmodule Main do
     end
 
 
-    {is_dir, entries} =
+    {_, entries} =
       case File.dir?(target) do
         true ->
           {true, contents(target)}
@@ -58,7 +58,7 @@ defmodule Main do
     Enum.each(entries, fn entry ->
       case File.exists?(entry) do
         true ->
-          {output, exit_code} = System.cmd("sh", ["-c", "git add #{entry}"])
+          {_, exit_code} = System.cmd("sh", ["-c", "git add #{entry}"])
           case exit_code do
             0 ->
               # IO.puts(" -- Done!")
@@ -67,7 +67,7 @@ defmodule Main do
               # IO.puts(" -- exit_code: #{exit_code}")
               :err
           end
-          {output, exit_code} = System.cmd("sh", ["-c", "git commit -m 'vingle: autocommit: #{DateTime.utc_now()}'"])
+          {_, exit_code} = System.cmd("sh", ["-c", "git commit -m 'vingle: autocommit: #{DateTime.utc_now()}'"])
           case exit_code do
             0 ->
               # IO.puts(" -- Done!")
@@ -94,7 +94,7 @@ defmodule Main do
       |> Enum.at(-1)
     IO.puts(branch_name)
 
-    {output, exit_code} = System.cmd("sh", ["-c", "git push origin #{branch_name}"])
+    {_, exit_code} = System.cmd("sh", ["-c", "git push origin #{branch_name}"])
   end
 
   def usage do
