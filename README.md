@@ -1,6 +1,9 @@
 # Coding challanges (recreational programming.)
 > This project is only for my love towards *Recreational programming*.
 
+# Todo:
+  - c3 language (https://c3-lang.org/).
+
 # Rules:
 ## `1. no AI.`
 - To prove that I can code.
