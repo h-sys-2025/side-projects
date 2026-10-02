@@ -52,3 +52,12 @@ print $file "Hello Sailor!\n";
 print $file "This is a new file.\n";
 
 close $file;
+
+### over writing ################
+
+open my $file, ">>", "log.txt"
+    or die "Cannot open: $!";
+
+print $file "logging: Program started\n";
+
+close $file;
