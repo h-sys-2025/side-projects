@@ -150,3 +150,11 @@ for my $i (0..$#database) {
   print "data record entry #$i: person: $database[$i]{name} with age: $database[$i]{age}\n";
 }
 
+# more advanced stuff, refernces of hashes and arrays #######################
+
+my $numbers = [1, 2, 3]; # refrence to an array.
+my $person  = { name => "Hamza", age => 17 }; $ ref hash.
+
+print "$numbers->[0]\n";
+print "$person->{name}\n";
+
