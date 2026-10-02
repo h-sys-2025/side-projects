@@ -138,3 +138,15 @@ for my $hobby (@my_hobbies) {
   print "-> $hobby\n";
 }
 
+# advances hashes and arrays #############################
+
+my @database = (
+  { name => "Hamza", age => 17 },
+  { name => "Ali",   age => 20 },
+  { name => "Ahmed", age => 25 }
+);
+
+for my $i (0..$#database) {
+  print "data record entry #$i: person: $database[$i]{name} with age: $database[$i]{age}\n";
+}
+
