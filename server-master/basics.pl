@@ -153,7 +153,7 @@ for my $i (0..$#database) {
 # more advanced stuff, refernces of hashes and arrays #######################
 
 my $numbers = [1, 2, 3]; # refrence to an array.
-my $person  = { name => "Hamza", age => 17 }; $ ref hash.
+my $person  = { name => "Hamza", age => 17 }; # ref hash.
 
 print "$numbers->[0]\n";
 print "$person->{name}\n";
@@ -167,5 +167,5 @@ my %user = (
     nums => \@nums
 );
 
-print $user{name};
-print $user{nums}[1];
+print "$user{name}\n";
+print "$user{nums}[1]\n";
