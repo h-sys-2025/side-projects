@@ -158,3 +158,14 @@ my $person  = { name => "Hamza", age => 17 }; $ ref hash.
 print "$numbers->[0]\n";
 print "$person->{name}\n";
 
+# more advaced stuff #########################
+
+my @nums = (10, 20, 30);
+
+my %user = (
+    name => "Hamza",
+    nums => \@nums
+);
+
+print $user{name};
+print $user{nums}[1];
